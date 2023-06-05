@@ -11,14 +11,14 @@ The implementation of gravitational forces is of paramount importance when simul
 - Computation
 - Visualize and analyze results
 
-![Pseudo code](./ReadmePic/PseudoCode.png)
+![Pseudo code](./pic/pic_readme/PseudoCode.png)
 
 ## I-2. wiki of pykdgrav
 [pykdgrav](https://github.com/mikegrudic/pytreegrav/issues/1)
 
 ## I-3. tetrahedron volume formula
 
-<img src="ReadmePic/tetrahedron.png" alt="Nbody" style="zoom:50%;" />
+<img src="./pic/pic_readme/tetrahedron.png" alt="Nbody" style="zoom:50%;" />
 
 $$V=\frac{1}{6}\left|\begin{array}{lll}
 x_2-x_1 & y_2-y_1 & z_2-z_1 \\
@@ -30,7 +30,7 @@ x_4-x_1 & y_4-y_1 & z_4-z_1
 
 # II N-body Dynamics 
 
-<img src="ReadmePic/Nbody_v2.png" alt="Nbody" style="zoom:50%;" />
+<img src="./pic/pic_readme/Nbody_v2.png" alt="Nbody" style="zoom:50%;" />
 
 This is an N-body problem, so the motion equation focuses on one single body. At first, bodies that make up an asteroid are
 
@@ -132,16 +132,17 @@ Then the transformation from orbital elements to Position/Velocity can be employ
 
 <table>
     <tr>
-        <td ><center><img src="ReadmePic/FlybyOrbit_integration.png" >Fig.1 </center></td>
-        <td ><center><img src="ReadmePic/FlybyOrbit_integration2.png"  >Fig.2 </center></td>
+        <td ><center><img src="./pic/pic_readme/FlybyOrbit_integration.png" >Fig.1 </center></td>
+        <td ><center><img src="./pic/pic_readme/FlybyOrbit_integration2.png"  >Fig.2 </center></td>
     </tr>
 </table>
 
 
 
+
 The comparison between the 0th-order and 2nd-order gravity is determined with the normalized unit.
 
-![Gravity_Compare_0and2order](ReadmePic/Gravity_Compare_0and2order.png)
+![Gravity_Compare_0and2order](./pic/pic_readme/Gravity_Compare_0and2order.png)
 
 ### 
 
