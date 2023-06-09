@@ -8,6 +8,10 @@
 @desc: 
 """
 import numpy as np
+import sys
+import traceback
+from CustomError import CustomError
+from RotationMatrix import RotationMatrix
 
 
 # This is a sample Python script.
@@ -20,11 +24,13 @@ class Obj_class:
     """
     This is a OBJ file class
     """
-    def __init__(self, mat_name,mat_value, vertices, faces):
+    def __init__(self, mat_name = None,mat_value = None, vertices = None, faces = None):
         self.mat_name = mat_name
         self.mat_value = mat_value
         self.vertices = vertices
         self.faces = faces
+        self.verNum = np.size(vertices, 0)       # Number of vertices
+        self.facNum = np.size(faces, 0)      # Number of faces
 
     def displayObjInfo(self):
         """
@@ -37,6 +43,52 @@ class Obj_class:
         print("material properties: ", self.mat_value.keys())
         print("vertices size: ", self.vertices.shape)
         print("faces size: ", self.faces.shape)
+
+    def objTranslation(self, dS, direction):
+        """
+        This function translates the polyhedron object in 'direction'
+        :param dS: Translation length
+        :param direction: Translation direction
+        :return: translated vertices
+        """
+        if direction=='X':
+            self.vertices = self.vertices + np.array([dS, 0, 0])
+        elif direction == 'Y':
+            self.vertices = self.vertices + np.array([0, dS, 0])
+        elif direction == 'Z':
+            self.vertices = self.vertices + np.array([0, 0, dS])
+        else:
+            self.showError("The translation direction must be:\n 'X', 'Y', or 'Z'")
+
+    def objRotation(self, rad, axis):
+        """
+        This function rotates the polyhedron object
+        :param rad: Rotation radian
+        :param axis: Rotation axis
+        :return: rotated vertices
+        """
+        ver = np.zeros([self.verNum,3])
+        if axis == 'X' or 'Y' or 'Z':
+            DCM = RotationMatrix(rad, axis)
+        else:
+            self.showError("The rotation axis must be:\n 'X', 'Y', or 'Z'")
+
+        for i in range(self.verNum):
+            ver[i,:] = DCM.dot(self.vertices[i,:])
+            # self.vertices[i, :] = DCM.dot(self.vertices[i, :])
+        return ver
+
+    def showError(self, msg):
+        """
+        this function prints an error message and stops the execution the program.
+        :param msg: the message to be shown
+        :return: exit program
+        """
+        try:
+            raise CustomError(msg)
+        except CustomError as e:
+            traceback.print_exc()
+            sys.exit(-1)
 
 
 

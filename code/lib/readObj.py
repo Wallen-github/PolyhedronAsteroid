@@ -87,8 +87,8 @@ def Objreader(Objpath,file):
             facNum += 1
 
     for i in range(ObjNum):
-        OBJ_list[i].vertices = np.array([OBJ_list[i].vertices])
-        OBJ_list[i].faces = np.array([OBJ_list[i].faces])
+        OBJ_list[i].vertices = np.array(OBJ_list[i].vertices)
+        OBJ_list[i].faces = np.array(OBJ_list[i].faces)
 
     return OBJ_list
 

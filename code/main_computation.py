@@ -25,9 +25,9 @@ timer_id = chipy.timer_GetNewTimer('gravity computation')
 
 chipy.SetDimension(3)
 
-dt = 5.e-5
+dt = 1.e-4
 theta = 0.5
-nb_steps = 50000
+nb_steps = 10000
 
 echo = 0
 
