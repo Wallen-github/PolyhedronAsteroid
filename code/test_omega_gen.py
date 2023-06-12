@@ -48,7 +48,7 @@ faces2 = np.array([[1,2,3],[1,4,3],[1,4,8],[1,5,8],[1,2,6],[1,5,6],
 
 OBJ1 = Obj_class(vertices = vertices1, faces = faces1)
 OBJ1.objTranslation(dS = 1,direction='X')
-ver = OBJ1.objRotation(rad = 2*np.pi, axis='X')
+OBJ1.objRotation(rad = np.pi/4, axis='X')
 OBJ2 = Obj_class(vertices = vertices2, faces = faces2)
 OBJ2.objTranslation(dS = -1,direction='X')
 # OBJ2.objRotation(rad = np.pi/2, axis='X')

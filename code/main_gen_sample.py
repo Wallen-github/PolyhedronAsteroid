@@ -9,10 +9,9 @@
 """
 
 import sys
-sys.path.append('./lib')
-from lib.readObj import *
 import numpy as np
 from pylmgc90.pre import *
+from lib.readObj import readObj
 
 if not os.path.isdir('./DATBOX'):
     os.mkdir('./DATBOX')

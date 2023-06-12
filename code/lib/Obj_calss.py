@@ -75,8 +75,7 @@ class Obj_class:
 
         for i in range(self.verNum):
             ver[i,:] = DCM.dot(self.vertices[i,:])
-            # self.vertices[i, :] = DCM.dot(self.vertices[i, :])
-        return ver
+        self.vertices = ver
 
     def showError(self, msg):
         """

@@ -46,6 +46,17 @@ $$\mu_i F^{ext} =-\sum_{\substack{j=1 \\ j \neq i}}^n \frac{\mu_i \mu_j\mathbf{r
 
 where $\mu_i = m_i/[M]$.
 
+### II.1 Conservation Principles
+
+$$
+\begin{aligned}
+&T=\frac{1}{2 M} \sum_{i=1}^{N-1} \sum_{j=i+1}^N m_i m_j\left({^\mathcal{N}\boldsymbol{v}_{i j}} \cdot {^\mathcal{N}\boldsymbol{v}_{i j}}\right)+\frac{1}{2} \sum_{i=1}^N{^\mathcal{N}\boldsymbol{\omega}_i^T} \cdot {^\mathcal{N}I_i} \cdot {^\mathcal{N}\boldsymbol{\omega}_i} \\
+&U=-\mathcal{G} \sum_{i=1}^{N-1} \sum_{j=i+1}^N \frac{m_i m_j}{\left|^\mathcal{N}\boldsymbol{r}_{i j}\right|} \\
+&\boldsymbol{H}=\frac{1}{M} \sum_{i=1}^{N-1} \sum_{j=i+1}^N m_i m_j\left({^\mathcal{N}\boldsymbol{r}_{i j}} \times {^\mathcal{N}\boldsymbol{v}_{i j}}\right)+\sum_{i=1}^N {^\mathcal{N}I_i} {^\mathcal{N}\boldsymbol{\omega}_i}\\
+&I_p=\frac{1}{M} \sum_{i=1}^{N-1} \sum_{j=i+1}^N m_i m_j\left({^\mathcal{N}\boldsymbol{r}_{i j}} \cdot {^\mathcal{N}\boldsymbol{r}_{i j}}\right) + \frac{1}{2}\sum_{i=1}^NTrace(^\mathcal{N}\boldsymbol{I}_i)
+\end{aligned}
+$$
+
 
 
 # III Flyby Orbit
