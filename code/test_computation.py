@@ -11,10 +11,9 @@
 from __future__ import print_function
 import os, sys
 sys.path.append("..")
+from lib.TraParam import Get_EnergyMomentum
 from pylmgc90 import chipy
 from pykdgrav import *
-
-sys.path.append('..')
 
 chipy.Initialize()
 
@@ -26,9 +25,9 @@ timer_id = chipy.timer_GetNewTimer('gravity computation')
 
 chipy.SetDimension(3)
 
-dt = 1.e-3
+dt = 1.e-4
 theta = 0.5
-nb_steps = 1000
+nb_steps = 10000
 
 echo = 0
 
@@ -101,8 +100,8 @@ chipy.WriteDisplayFiles(1)
 
 for k in range(1, nb_steps + 1):
     print(k, '/', (nb_steps + 1))
-    inertia = chipy.RBDY3_GetGlobInertia(2)
-    print('body 2, inertia = ', inertia)
+    # inertia = chipy.RBDY3_GetGlobInertia(2)
+    # print('body 2, inertia = ', inertia)
     #
     chipy.IncrementStep()
 
@@ -117,13 +116,16 @@ for k in range(1, nb_steps + 1):
 
     chipy.timer_StartTimer(timer_id)
     # fext[:, 0:3] = Accel(p_coor, mass, G=6.6742e-11)
-    fext[:, 0:3] = Accel(p_coor, mass, G=1)
+    fext[:, 0:3] = Accel(p_coor, mass, G=1.)
     for i in range(0, nbR3, 1):
         fext[i, :] = fext[i, :] * mass[i]
     chipy.timer_StopTimer(timer_id)
 
     for i in range(0, nbR3, 1):
         chipy.RBDY3_PutBodyVector('Fext_', i + 1, fext[i, :])
+
+    Energy, Knetic, momentum = Get_EnergyMomentum(nbR3, GG=1)
+    print('Momentum = ', momentum)
 
     chipy.ComputeBulk()
     chipy.ComputeFreeVelocity()

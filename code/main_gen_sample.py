@@ -9,6 +9,7 @@
 """
 
 import sys
+sys.path.append('./lib')
 import numpy as np
 from pylmgc90.pre import *
 from lib.readObj import readObj
@@ -33,7 +34,7 @@ mat.addMaterial(stone)
 mod = model(name='rigid', physics='MECAx', element='Rxx3D', dimension=dim)
 
 Objpath = "./data/"
-Objfile = "Apophis_N4_v500.obj"
+Objfile = "Apophis_N2_v2000.obj"
 OBJ = readObj(Objpath,Objfile)
 for i in range(len(OBJ)):
     vertices = OBJ[i].vertices

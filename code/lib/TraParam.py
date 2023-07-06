@@ -7,6 +7,8 @@
 @date: 6/8/23 16:33
 @desc: 
 """
+import sys
+sys.path.append("..")
 import numpy as np
 from pylmgc90 import chipy
 
@@ -44,10 +46,3 @@ def Get_EnergyMomentum(nbR3,GG=1):
     Energy = Knetic + potent
     momentum[0,3] = np.dot(momentum[0,0:3],momentum[0,0:3])
     return Energy, Knetic, momentum
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/

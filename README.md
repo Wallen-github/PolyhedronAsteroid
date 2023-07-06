@@ -30,12 +30,25 @@ x_4-x_1 & y_4-y_1 & z_4-z_1
 
 # II N-body Dynamics 
 
-<img src="./pic/pic_readme/Nbody_v2.png" alt="Nbody" style="zoom:50%;" />
+<img src="./pic/pic_readme/Nbody.png" alt="Nbody" style="zoom:50%;" />
 
-This is an N-body problem, so the motion equation focuses on one single body. At first, bodies that make up an asteroid are
+This is an N-body problem, so the motion equation focuses on one single body. At first, The force acts on the $i-th$ part of asteroid is 
 
-$$m_i F^{ext} = m_i \ddot{\mathbf{q}}_i=-\sum_{\substack{j=1 \\ j \neq i}}^n \frac{G m_i m_j\left(\mathbf{q}_j-\mathbf{q}_i\right)}{\left\|\mathbf{q}_j-\mathbf{q}_i\right\|^3}=-\sum_{\substack{j=1 \\ j \neq i}}^n \frac{G m_i m_j\mathbf{r}_{ji}}{r_{ji}^3}$$
+$$F^{ext} = m_i \ddot{\mathbf{q}}_i=\sum_{\substack{j=1 \\ j \neq i}}^n \frac{G m_i m_j\left(\mathbf{q}_j-\mathbf{q}_i\right)}{\left\|\mathbf{q}_j-\mathbf{q}_i\right\|^3} + \frac{G m_i m_0\left(\mathbf{q}_0-\mathbf{q}_i\right)}{\left\|\mathbf{q}_0-\mathbf{q}_i\right\|^3}$$
 
+Then, the force law between asteroid and Earth is
+$$
+m_0 \ddot{\mathbf{q}}_0 = -\frac{G m_A m_0\left(\mathbf{q}_0-\mathbf{q}_{cm}\right)}{\left\|\mathbf{q}_0-\mathbf{q}_{cm}\right\|^3}\\
+m_A \ddot{\mathbf{q}}_{cm} = \frac{G m_A m_0\left(\mathbf{q}_0-\mathbf{q}_{cm}\right)}{\left\|\mathbf{q}_0-\mathbf{q}_{cm}\right\|^3}\\
+$$
+The relative motion of Earth w.r.t the Asteroid is
+$$
+\ddot{\mathbf{q}}_0 - \ddot{\mathbf{q}}_{cm} = -\frac{G (m_A +  m_0)\left(\mathbf{q}_0-\mathbf{q}_{cm}\right)}{\left\|\mathbf{q}_0-\mathbf{q}_{cm}\right\|^3}
+$$
+Also,the center of mass vector is
+$$
+\mathbf{q}_{cm} = \frac{\sum_{\substack{i=1}}^n\mathbf{q}_i}{\sum_{\substack{i=1}}^n m_i} = \frac{\sum_{\substack{i=1}}^n\mathbf{q}_i}{m_A}
+$$
 Employing a normalized unit to speed up the integration
 
 $$[L] =  (V)^{1/3},~[M] = \sum m_i,~[T] = \sqrt{[L]^3/G[M]},~ G = 1$$
@@ -48,6 +61,7 @@ where $\mu_i = m_i/[M]$.
 
 ### II.1 Conservation Principles
 
+Given these definitions, an integral form of the kinetic energy, polar moment, gravitational potential energy, and angular momentum vector can be stated as
 $$
 \begin{aligned}
 &T=\frac{1}{2 M} \sum_{i=1}^{N-1} \sum_{j=i+1}^N m_i m_j\left({^\mathcal{N}\boldsymbol{v}_{i j}} \cdot {^\mathcal{N}\boldsymbol{v}_{i j}}\right)+\frac{1}{2} \sum_{i=1}^N{^\mathcal{N}\boldsymbol{\omega}_i^T} \cdot {^\mathcal{N}I_i} \cdot {^\mathcal{N}\boldsymbol{\omega}_i} \\
@@ -58,14 +72,13 @@ $$
 $$
 
 
-
 # III Flyby Orbit
 
 From the known knowledge, we have the Geocentric hyperbolic orbit elements $\sigma_G$. We need to transport it to the Apophis's center mass frame $\mathbf{r}_0$ .
 
 $$\sigma_G \Rightarrow \mathbf{R}_G \Rightarrow \mathbf{r}_0$$
 
-The intermediate variable $\mathbf{R}_G$ is the asteroid's vector at the Earth Center Inertial Coordinates (ECI). We have the equation 
+The intermediate variable $\mathbf{R}_G$ is the asteroid's vector at the Earth Center Inertial Coordinates (ECI). We have the equation. 
 
 $$\mathbf{r_0}=-\mathbf{R}_G$$
 
