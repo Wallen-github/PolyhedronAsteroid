@@ -56,7 +56,7 @@ def Objreader(Objpath,file):
         line = line.strip('\n')
 
         if not line:
-            print('Error: This OBJ file is empty.')
+            print('Finish read OBJ file.')
             break
         strs = line.split(" ")
 
@@ -111,7 +111,7 @@ def Matreader(matfile):
         line = line.strip('\n')
 
         if not line:
-            print('Error: This mtllib file is empty.')
+            print('Finish read mtllib file.')
             break
 
         strs = line.split(" ")

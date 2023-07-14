@@ -12,6 +12,10 @@ from __future__ import print_function
 import os, sys
 from pylmgc90 import chipy
 from pykdgrav import *
+from lib.TraParam import *
+from lib.PlotFunc import *
+from lib.InitialSet import *
+
 
 sys.path.append('..')
 
@@ -25,7 +29,7 @@ timer_id = chipy.timer_GetNewTimer('gravity computation')
 
 chipy.SetDimension(3)
 
-dt = 1.e-4
+dt = 1.e-3
 theta = 0.5
 nb_steps = 10000
 
@@ -91,9 +95,14 @@ for i in range(nbR3):
 coor = np.empty([nbR3, 6], dtype=float)
 p_coor = np.empty([nbR3, 3], dtype=float)
 vbeg = np.empty([nbR3, 6], dtype=float)
-
 fext = np.empty([nbR3, 6], dtype=float)
-cij = np.zeros(3)
+
+# varibles for plot
+Plot_T = np.empty([nb_steps,1],dtype=float)
+Plot_Momentum = np.empty([nb_steps,4],dtype=float)
+Plot_Kinetic = np.empty([nb_steps,1],dtype=float)
+Plot_Energy = np.empty([nb_steps,1],dtype=float)
+Plot_Vbeg = np.empty([nb_steps, nbR3*6], dtype=float)
 
 chipy.OpenDisplayFiles()
 chipy.WriteDisplayFiles(1)
@@ -101,6 +110,13 @@ chipy.WriteDisplayFiles(1)
 for k in range(1, nb_steps + 1):
     print(k, '/', (nb_steps + 1))
     #
+    # Globinertia = chipy.RBDY3_GetGlobInertia(1)
+    # Bodyinertia = chipy.RBDY3_GetBodyInertia(1)
+    # print('body 1, Global inertia = ', Globinertia, 'Body inertia = ', Bodyinertia)
+    # Globinertia = chipy.RBDY3_GetGlobInertia(2)
+    # Bodyinertia = chipy.RBDY3_GetBodyInertia(2)
+    # print('body 2, Global inertia = ', Globinertia, 'Body inertia = ', Bodyinertia)
+
     chipy.IncrementStep()
 
     chipy.ComputeFext()
@@ -109,6 +125,7 @@ for k in range(1, nb_steps + 1):
 
     for i in range(0, nbR3, 1):
         coor[i, :] = chipy.RBDY3_GetBodyVector('Coorb', i + 1)
+        vbeg[i,:] = chipy.RBDY3_GetBodyVector('Vfree', i + 1)
         p_coor[i, 0:3] = coor[i, 0:3]
         fext[i, :] = 0.
 
@@ -121,6 +138,19 @@ for k in range(1, nb_steps + 1):
 
     for i in range(0, nbR3, 1):
         chipy.RBDY3_PutBodyVector('Fext_', i + 1, fext[i, :])
+
+    Energy, Kinetic, momentum = Get_EnergyMomentum(nbR3, GG=1)
+    # print('Momentum = ', momentum)
+
+    # Record data for plot
+    UnitE = ApophisPram.UnitM*(ApophisPram.UnitL/ApophisPram.UnitT)**2
+    UnitH = ApophisPram.UnitM*ApophisPram.UnitL**2/ApophisPram.UnitT
+    Plot_T[k - 1, 0] = dt * (k - 1)
+    Plot_Energy[k - 1, 0] = Energy
+    Plot_Kinetic[k - 1, 0] = Kinetic
+    Plot_Momentum[k - 1, :] = momentum
+    for i in range(0, nbR3, 1):
+        Plot_Vbeg[k - 1, i * 6:i * 6 + 6] = vbeg[i, :]
 
     chipy.ComputeBulk()
     chipy.ComputeFreeVelocity()
@@ -146,4 +176,17 @@ chipy.WriteLastDof()
 chipy.CloseDisplayFiles()
 
 chipy.Finalize()
+
+# Plot
+Plot_T = np.delete(Plot_T, 0, axis=0)
+Plot_Momentum = np.delete(Plot_Momentum, 0, axis=0)
+Plot_Energy = np.delete(Plot_Energy, 0, axis=0)
+Plot_Kinetic = np.delete(Plot_Kinetic, 0, axis=0)
+Plot_Vbeg = np.delete(Plot_Vbeg, 0, axis=0)
+
+plot_momentum(Plot_T,Plot_Momentum)
+plot_kinetic(Plot_T,Plot_Kinetic)
+plot_energy(Plot_T,Plot_Energy)
+plot_omega(Plot_T, Plot_Vbeg, nbR3, 2, 1)
+plot_velocity(Plot_T, Plot_Vbeg, nbR3, 2, 1)
 
