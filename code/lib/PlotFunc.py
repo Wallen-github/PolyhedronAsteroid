@@ -51,6 +51,22 @@ def plot_omega(Plot_T, Plot_Vbeg, nbR3, row, col):
         plt.legend(['$\omega_1$','$\omega_2$','$\omega_3$'])
     plt.show()
 
+def plot_eulerangle(Plot_T, Plot_EA):
+    plt.figure()
+    plt.plot(Plot_T, Plot_EA[:, 0:3])
+    plt.xlabel('time')
+    plt.ylabel('Euler Angle (rad)')
+    plt.legend(['$\phi$','$\theta$','$\psi$'])
+    plt.show()
+
+def plot_inertia(Plot_T, Plot_inertia):
+    plt.figure()
+    plt.plot(Plot_T, Plot_inertia[:, 0:3])
+    plt.xlabel('time')
+    plt.ylabel('I_{body}')
+    plt.legend(['$I_1$','$I_2$','$I_3$'])
+    plt.show()
+
 def plot_velocity(Plot_T, Plot_Vbeg, nbR3, row, col):
     plt.figure()
     for i in range(0, nbR3, 1):

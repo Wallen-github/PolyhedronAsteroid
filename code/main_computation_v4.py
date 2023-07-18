@@ -13,7 +13,7 @@ import numpy as np
 from lib.PlotFunc import *
 
 sys.path.append("..")
-from lib.TraParam import Get_EnergyMomentum
+from lib.SubFunc import *
 from pylmgc90 import chipy
 from pykdgrav import *
 
@@ -26,11 +26,13 @@ chipy.utilities_DisableLogMes()
 timer_id = chipy.timer_GetNewTimer('gravity computation')
 
 chipy.SetDimension(3)
-UnitT = 122405.34764413263
-time = 2*np.pi/UnitT
+
+UnitM, UnitL, UnitT  = Set_Unit()
+time = 1*86400/UnitT
+
 dt = 1.e-3
 theta = 0.5
-nb_steps = 100000
+nb_steps = int64(time/dt)
 
 echo = 0
 
@@ -102,6 +104,8 @@ Plot_Momentum = np.empty([nb_steps,4],dtype=float)
 Plot_Kinetic = np.empty([nb_steps,1],dtype=float)
 Plot_Energy = np.empty([nb_steps,1],dtype=float)
 Plot_Vbeg = np.empty([nb_steps, nbR3*6], dtype=float)
+Plot_inertia = np.empty([nb_steps, 3], dtype=float)
+Plot_EA = np.empty([nb_steps, 3], dtype=float)
 
 chipy.OpenDisplayFiles()
 chipy.WriteDisplayFiles(1)
@@ -136,12 +140,16 @@ for k in range(1, nb_steps + 1):
 
     Energy, Kinetic, momentum = Get_EnergyMomentum(nbR3, GG=1)
     # print('Momentum = ', momentum)
+    inertia_global, inertia_body, DCM_NB = Get_TotalMomentOfInertia_com(nbR3)
+    theta1, theta2, theta3 = DCM2EA_313(DCM_NB)
 
     # Record data for plot
-    Plot_T[k-1,0] = dt*(k-1)
+    Plot_T[k-1,0] = dt*(k-1)*UnitT/3600
     Plot_Energy[k-1,0] = Energy
     Plot_Kinetic[k-1,0] = Kinetic
     Plot_Momentum[k-1,:] = momentum
+    Plot_inertia[k-1,:] = inertia_body
+    Plot_EA[k-1,:] = [theta1, theta2, theta3]
     for i in range(0, nbR3, 1):
         Plot_Vbeg[k-1,i*6:i*6+6] = vbeg[i, :]
 
@@ -176,9 +184,13 @@ Plot_Momentum = np.delete(Plot_Momentum, 0, axis=0)
 Plot_Energy = np.delete(Plot_Energy, 0, axis=0)
 Plot_Kinetic = np.delete(Plot_Kinetic, 0, axis=0)
 Plot_Vbeg = np.delete(Plot_Vbeg, 0, axis=0)
+Plot_EA = np.delete(Plot_EA, 0, axis=0)
+Plot_inertia = np.delete(Plot_inertia, 0, axis=0)
 
 plot_momentum(Plot_T,Plot_Momentum)
-plot_kinetic(Plot_T,Plot_Kinetic)
-plot_energy(Plot_T,Plot_Energy)
-plot_omega(Plot_T, Plot_Vbeg, nbR3, 2, 1)
-plot_velocity(Plot_T, Plot_Vbeg, nbR3, 2, 1)
+# plot_kinetic(Plot_T,Plot_Kinetic)
+# plot_energy(Plot_T,Plot_Energy)
+# plot_omega(Plot_T, Plot_Vbeg, nbR3, 2, 1)
+# plot_velocity(Plot_T, Plot_Vbeg, nbR3, 2, 1)
+# plot_eulerangle(Plot_T, Plot_EA)
+# plot_inertia(Plot_T, Plot_inertia)
