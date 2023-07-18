@@ -27,7 +27,7 @@ Objfile = "Apophis_N2_v2000.obj"
 OBJ = readObj(Objpath,Objfile)
 
 dim = 3
-rho = 1.
+rho = 10.
 Omega = 3e-5
 bodies = avatars()
 mat    = materials()
@@ -37,7 +37,7 @@ stone = material(name='STONE', materialType='RIGID', density=rho)
 mat.addMaterial(stone)
 mod = model(name='rigid', physics='MECAx', element='Rxx3D', dimension=dim)
 
-vertices1 = OBJ[0].vertices + np.array([0.4,0,0])
+vertices1 = OBJ[0].vertices + np.array([0.8,0,0])
 faces1 = OBJ[0].faces
 vertices2 = OBJ[1].vertices
 faces2 = OBJ[1].faces
@@ -101,19 +101,19 @@ COM = (poly1.contactors[0].volume*rho*poly1.nodes[1].coor
 # poly1.rotate(description='axis',alpha=np.pi/4.,axis=[0.,0.,1.])
 # poly2.rotate(description='axis',alpha=np.pi/4.,axis=[0.,0.,1.])
 
-omegaN = np.array([0.,0.,2.*np.pi/10])
+omegaN = np.array([0.,0.,2.*np.pi/15])
 omegaB1 = np.dot(poly1.bulks[0].axis.T,omegaN)
 omegaB2 = np.dot(poly2.bulks[0].axis.T,omegaN)
 r1 = poly1.nodes[1].coor
 r2 = poly2.nodes[1].coor
-vel1 = np.cross(omegaB1,r1)
-vel2 = np.cross(omegaB2,r2)
+vel1 = np.cross(omegaN,r1)
+vel2 = np.cross(omegaN,r2)
 velo1 = [vel1[0],vel1[1],vel1[2],omegaB1[0],omegaB1[1],omegaB1[2]]
 velo2 = [vel2[0],vel2[1],vel2[2],omegaB2[0],omegaB2[1],omegaB2[2]]
 poly1.imposeInitValue(component=[1,2,3,4,5,6], value=velo1)
 poly2.imposeInitValue(component=[1,2,3,4,5,6], value=velo2)
-poly1.imposeDrivenDof(component=[1, 2, 3], dofty='vlocy')
-poly2.imposeDrivenDof(component=[1, 2, 3], dofty='vlocy')
+# poly1.imposeDrivenDof(component=[1, 2, 3], dofty='vlocy')
+# poly2.imposeDrivenDof(component=[1, 2, 3], dofty='vlocy')
 
 bodies.addAvatar(poly1)
 bodies.addAvatar(poly2)
