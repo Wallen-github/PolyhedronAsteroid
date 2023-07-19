@@ -101,8 +101,31 @@ def Set_Unit():
     UnitM = GMA/GG
     UnitL = RA
     UnitT = np.sqrt(UnitL**3/GG/UnitM)
+    UnitG = 1.
 
-    return UnitM, UnitL, UnitT
+    return UnitM, UnitL, UnitT, UnitG
+
+def Get_CenterMass(coor,mass):
+    '''
+    This function computes the center of mass
+    Args:
+        coor (numpy array): positions in the inertial frame
+        mass (numpy array): mass
+
+    Returns:
+        CM center of mass
+        coor_cm coordinate origin at center of mass
+    '''
+    CM = np.zeros([3])
+    coor_cm = np.zeros([len(mass),3])
+    for i in range(len(mass)):
+        CM += mass[i]*coor[i,:]
+    CM = CM/np.sum(mass)
+
+    for i in range(len(mass)):
+        coor_cm[i,:] = coor[i,:] - CM
+
+    return CM,coor_cm
 
 def Get_TotalMomentOfInertia_com(nbR3):
     inertia_global = np.zeros([3, 3], 'd')

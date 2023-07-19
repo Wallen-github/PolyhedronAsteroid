@@ -10,6 +10,7 @@
 from __future__ import print_function
 import os, sys
 import numpy as np
+from lib.ExternalTorques import *
 from lib.PlotFunc import *
 
 sys.path.append("..")
@@ -27,10 +28,10 @@ timer_id = chipy.timer_GetNewTimer('gravity computation')
 
 chipy.SetDimension(3)
 
-UnitM, UnitL, UnitT  = Set_Unit()
-time = 1*86400/UnitT
+UnitM, UnitL, UnitT, UnitG  = Set_Unit()
+time = 3*86400/UnitT
 
-dt = 1.e-3
+dt = 1.e-1
 theta = 0.5
 nb_steps = int64(time/dt)
 
@@ -93,6 +94,10 @@ mass = np.zeros(nbR3)
 for i in range(nbR3):
     mass[i] = chipy.RBDY3_GetMass(i + 1)
 
+# Get the initial position of Earth
+massA = np.sum(mass)
+PosVecE0 = InitialPosVel_Earth(massA, time)
+
 coor = np.empty([nbR3, 6], dtype=float)
 p_coor = np.empty([nbR3, 3], dtype=float)
 vbeg = np.empty([nbR3, 6], dtype=float)
@@ -129,10 +134,16 @@ for k in range(1, nb_steps + 1):
         fext[i, :] = 0.
 
     chipy.timer_StartTimer(timer_id)
+
+    # Get Earth acceleration and position
+    posE, PosVec = EarthPos(massA, k, dt, PosVecE0)
+    CMP, coor_cm = Get_CenterMass(coor[:, 0:3], mass)
+
     # fext[:, 0:3] = Accel(p_coor, mass, G=6.6742e-11)
-    fext[:, 0:3] = Accel(p_coor, mass, G=1.)
+    fext[:, 0:3] = Accel(p_coor, mass, G=UnitG)
     for i in range(0, nbR3, 1):
-        fext[i, :] = fext[i, :] * mass[i]
+        AccelE = EarthAccel(posE+coor_cm[i,:], coor[i,:])
+        fext[i, :] = fext[i, :] * mass[i] #+ AccelE * mass[i]
     chipy.timer_StopTimer(timer_id)
 
     for i in range(0, nbR3, 1):
