@@ -30,8 +30,9 @@ chipy.SetDimension(3)
 
 UnitM, UnitL, UnitT, UnitG  = Set_Unit()
 time = 3*86400/UnitT
+time = 10
 
-dt = 1.e-1
+dt = 1.e-3
 theta = 0.5
 nb_steps = int64(time/dt)
 
@@ -98,34 +99,30 @@ for i in range(nbR3):
 massA = np.sum(mass)
 PosVecE0 = InitialPosVel_Earth(massA, time)
 
-coor = np.empty([nbR3, 6], dtype=float)
-p_coor = np.empty([nbR3, 3], dtype=float)
-vbeg = np.empty([nbR3, 6], dtype=float)
-fext = np.empty([nbR3, 6], dtype=float)
+coor = np.zeros([nbR3, 6], dtype=float)
+p_coor = np.zeros([nbR3, 3], dtype=float)
+vbeg = np.zeros([nbR3, 6], dtype=float)
+fext = np.zeros([nbR3, 6], dtype=float)
 
 # varibles for plot
-Plot_T = np.empty([nb_steps,1],dtype=float)
-Plot_Momentum = np.empty([nb_steps,4],dtype=float)
-Plot_Kinetic = np.empty([nb_steps,1],dtype=float)
-Plot_Energy = np.empty([nb_steps,1],dtype=float)
-Plot_Vbeg = np.empty([nb_steps, nbR3*6], dtype=float)
-Plot_inertia = np.empty([nb_steps, 3], dtype=float)
-Plot_EA = np.empty([nb_steps, 3], dtype=float)
+Plot_T = np.zeros([nb_steps,1],dtype=float)
+Plot_Momentum = np.zeros([nb_steps,4],dtype=float)
+Plot_Kinetic = np.zeros([nb_steps,1],dtype=float)
+Plot_Energy = np.zeros([nb_steps,1],dtype=float)
+Plot_Vbeg = np.zeros([nb_steps, nbR3*6], dtype=float)
+Plot_inertia = np.zeros([nb_steps, 3], dtype=float)
+Plot_EA = np.zeros([nb_steps, 3], dtype=float)
+Plot_PosVecE = np.zeros([nb_steps, 6], dtype=float)
 
 chipy.OpenDisplayFiles()
 chipy.WriteDisplayFiles(1)
 
 for k in range(1, nb_steps + 1):
     print(k, '/', (nb_steps + 1))
-    # Globinertia = chipy.RBDY3_GetGlobInertia(2)
-    # Bodyinertia = chipy.RBDY3_GetBodyInertia(2)
-    # print('body 2, Global inertia = ', Globinertia, 'Body inertia = ', Bodyinertia)
-    #
+
     chipy.IncrementStep()
 
     chipy.ComputeFext()
-
-    fext = np.empty([nbR3, 6], dtype=float)
 
     for i in range(0, nbR3, 1):
         coor[i, :] = chipy.RBDY3_GetBodyVector('Coorb', i + 1)
@@ -137,20 +134,33 @@ for k in range(1, nb_steps + 1):
 
     # Get Earth acceleration and position
     posE, PosVec = EarthPos(massA, k, dt, PosVecE0)
+    PosVecE0 = PosVec
     CMP, coor_cm = Get_CenterMass(coor[:, 0:3], mass)
 
     # fext[:, 0:3] = Accel(p_coor, mass, G=6.6742e-11)
-    fext[:, 0:3] = Accel(p_coor, mass, G=UnitG)
+    # fext[:, 0:3] = Accel(p_coor, mass, G=UnitG)
+    # for i in range(0, nbR3, 1):
+    #     AccelE = EarthAccel(posE, coor[i,:])
+    #     fext[i, :] = fext[i, :] * mass[i] + AccelE * mass[i]
+
+    GG = UnitG
+    massE = 5.974227245203837E24 / UnitM  # kg, Earth mass
     for i in range(0, nbR3, 1):
-        AccelE = EarthAccel(posE+coor_cm[i,:], coor[i,:])
-        fext[i, :] = fext[i, :] * mass[i] #+ AccelE * mass[i]
+        F_nbody = np.zeros([6], dtype=float)
+        for j in range(0, nbR3, 1):
+            if j != i:
+                r_norm = np.linalg.norm(coor[j,0:3]-coor[i,0:3])
+                F_nbody[0:3] += GG*mass[i]*mass[j]*(coor[j,0:3]-coor[i,0:3])/r_norm**3
+        r0_norm = np.linalg.norm(posE-coor[i,0:3])
+        # F_nbody[0:3] += GG*mass[i]*massE*(posE-coor[i,0:3])/r0_norm**3
+        fext[i,0:3] = F_nbody[0:3] - 2*np.cross(vbeg[i,3:6],vbeg[i,0:3]) - np.cross(vbeg[i,3:6],coor[i,0:3]) \
+                    - np.cross(vbeg[i,3:6],np.cross(vbeg[i,3:6],coor[i,0:3]))
     chipy.timer_StopTimer(timer_id)
 
     for i in range(0, nbR3, 1):
         chipy.RBDY3_PutBodyVector('Fext_', i + 1, fext[i, :])
 
     Energy, Kinetic, momentum = Get_EnergyMomentum(nbR3, GG=1)
-    # print('Momentum = ', momentum)
     inertia_global, inertia_body, DCM_NB = Get_TotalMomentOfInertia_com(nbR3)
     theta1, theta2, theta3 = DCM2EA_313(DCM_NB)
 
@@ -161,6 +171,7 @@ for k in range(1, nb_steps + 1):
     Plot_Momentum[k-1,:] = momentum
     Plot_inertia[k-1,:] = inertia_body
     Plot_EA[k-1,:] = [theta1, theta2, theta3]
+    Plot_PosVecE[k - 1, :] = np.append(PosVec[0:3]*UnitL/1E3,PosVec[3:6]*UnitL/1E3/UnitT)
     for i in range(0, nbR3, 1):
         Plot_Vbeg[k-1,i*6:i*6+6] = vbeg[i, :]
 
@@ -203,5 +214,6 @@ plot_momentum(Plot_T,Plot_Momentum)
 # plot_energy(Plot_T,Plot_Energy)
 # plot_omega(Plot_T, Plot_Vbeg, nbR3, 2, 1)
 # plot_velocity(Plot_T, Plot_Vbeg, nbR3, 2, 1)
-# plot_eulerangle(Plot_T, Plot_EA)
+plot_eulerangle(Plot_T, Plot_EA)
 # plot_inertia(Plot_T, Plot_inertia)
+plot_earthtraj(Plot_PosVecE)

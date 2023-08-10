@@ -54,10 +54,12 @@ poly02 = rigidPolyhedron(model=mod, material=stone, color='BLEUx',
 # faces2 = OBJ[1].faces
 
 # vertices1 = np.array([[0.5,-0.5,0.5],[0.5,0.5,0.5],[0.5,0.5,-0.5],[0.5,-0.5,-0.5],
-#                       [0.,0.,2.],[0.,2.,0.],[0.,0.,-2.],[0.,-2.,0.],[5.,0.6,0.7]]) + np.array([5,0,0])
+#                       [0.,0.,2.],[0.,2.,0.],[0.,0.,-2.],[0.,-2.,0.],[5.,0.6,0.7]])
+# faces1 = np.array([[1,2,3],[1,3,4],[1,5,6],[1,2,6],[2,6,7],[2,3,7],[3,7,8],[3,4,8],[1,5,8],[1,4,8]])
 # vertices2 = np.array([[0.,-2.,2.],[0.,2.,2.],[0.,2.,-2.],[0.,-2.,-2.],
 #                       [-1.,-1.,1.],[-1.,1.,1.],[-1.,1.,-1.],[-1.,-1.,-1.],
 #                       [0,0,-10]])
+# faces2 = np.array([[1,2,3],[1,3,4],[1,5,6],[1,2,6],[2,6,7],[2,3,7],[3,7,8],[3,4,8],[1,5,8],[1,4,8]])
 # poly01 = rigidPolyhedron(model=mod, material=stone, color='BLEUx',
 #                        generation_type='vertices', vertices=vertices1)
 # poly02 = rigidPolyhedron(model=mod, material=stone, color='BLEUx',

@@ -52,6 +52,24 @@ for i in range(len(OBJ)):
     COM += poly0.contactors[0].volume * poly0.nodes[1].coor
     poly0_list.append(poly0)
 
+# vertices1 = np.array([[2,1,-1],[2,-1,-1],[2,-1,1],[2,1,1],
+#                       [0,1,-1],[0,-1,-1],[0,-1,1],[0,1,1]])
+# faces1 = np.array([[1,2,3],[1,4,3],[1,4,8],[1,5,8],[1,2,6],[1,5,6],
+#                    [7,8,4],[7,3,4],[7,3,2],[7,6,2],[7,8,5],[7,6,5]])
+# vertices2 = np.array([[0,2,-2],[-3,2,-2],[-3,2,2],[0,2,2],
+#                       [0,-2,-2],[-3,-2,-2],[-3,-2,2],[0,-2,2]])
+# faces2 = np.array([[1,2,3],[1,4,3],[1,4,8],[1,5,8],[1,2,6],[1,5,6],
+#                    [7,8,4],[7,3,4],[7,3,2],[7,2,6],[7,8,5],[7,6,5]])
+# poly01 = rigidPolyhedron(model=mod, material=stone, color='BLEUx',
+#                        generation_type='vertices', vertices=vertices1)
+# poly02 = rigidPolyhedron(model=mod, material=stone, color='BLEUx',
+#                        generation_type='vertices', vertices=vertices2)
+# poly0_list = [poly01,poly02]
+# fac = [faces1,faces2]
+# ver = [vertices1,vertices2]
+# volume_total = poly01.contactors[0].volume + poly02.contactors[0].volume
+# COM = poly01.contactors[0].volume * poly01.nodes[1].coor + poly02.contactors[0].volume * poly02.nodes[1].coor
+
 
 UnitL = volume_total ** (1 / 3)
 COM = COM/volume_total/UnitL
@@ -68,11 +86,13 @@ omegaB = np.array([0.027030895893665, 0., 0.072584774502740])
 for i in range(len(OBJ)):
     vertices = OBJ[i].vertices/UnitL
     faces = OBJ[i].faces
+    # vertices = ver[i]/UnitL
+    # faces = fac[i]
     poly = rigidPolyhedron(model=mod, material=stone, color='BLEUx',
                             generation_type='full', vertices=vertices, faces=faces)
     poly.translate(-COM[0], -COM[1], -COM[2])
     poly.rotate(description='Euler', phi=theta1, theta=theta2, psi=theta3)
-    poly.rotate(description='axis', alpha=-np.pi/2,axis=[0., 1., 0.])
+    poly.rotate(description='axis', alpha=np.pi,axis=[0., 0., 1.])
 
     omegaBi = np.dot(poly.bulks[0].axis.T, omegaB)
     r = poly.nodes[1].coor

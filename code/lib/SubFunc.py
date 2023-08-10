@@ -33,7 +33,7 @@ def Get_TotalMomentOfInertia_gen(poly_list):
         for j in range(0, 3):
             d = np.array(poly0.nodes[1].coor)
             # d = np.array(poly0.contactors[0].shift)
-            d[i] = 0.
+            d[j] = 0.
             inertia_total[j, j] += poly0.contactors[0].volume * np.dot(d, d)
 
         # contribution de la distance a l'axe aux termes extra-diagonaux
@@ -97,7 +97,7 @@ def DCM2EA_313(DCM):
 def Set_Unit():
     GMA = 2.650         # m^3/s^2, Apophis gravitaional parameter
     GG = 6.67430e-11    # G, N*m^2/kg^2 = m^3/kg/s^2
-    RA = 163            # m
+    RA = 168            # m
     UnitM = GMA/GG
     UnitL = RA
     UnitT = np.sqrt(UnitL**3/GG/UnitM)
@@ -129,14 +129,14 @@ def Get_CenterMass(coor,mass):
 
 def Get_TotalMomentOfInertia_com(nbR3):
     inertia_global = np.zeros([3, 3], 'd')
-    coor = np.empty([nbR3, 6], dtype=float)
+    coor = np.zeros([nbR3, 6], dtype=float)
     for i in range(nbR3):
         inertia_global += chipy.RBDY3_GetGlobInertia(i+1)
         coor[i, :] = [0.,0.,0.,0.,0.,0.]#chipy.RBDY3_GetBodyVector('Coorb', i + 1)
         volume = chipy.RBDY3_GetVolume(i+1)
         for j in range(0, 3):
             d = np.array(coor[i, 0:3])
-            d[i] = 0.
+            d[j] = 0.
             inertia_global[j, j] += volume * np.dot(d, d)
 
         # contribution de la distance a l'axe aux termes extra-diagonaux
@@ -186,10 +186,10 @@ def Get_TotalMomentOfInertia_com(nbR3):
 
 def Get_EnergyMomentum(nbR3,GG=1):
 
-    momentum = np.empty([1,4], dtype=float)
-    mass = np.empty([nbR3], dtype=float)
-    coor = np.empty([nbR3, 6], dtype=float)
-    vel = np.empty([nbR3, 6], dtype=float)
+    momentum = np.zeros([4], dtype=float)
+    mass = np.zeros([nbR3], dtype=float)
+    coor = np.zeros([nbR3, 6], dtype=float)
+    vel = np.zeros([nbR3, 6], dtype=float)
     vel_cm = np.zeros([3], dtype=float)
     Energy = 0
     Knetic = 0
@@ -206,7 +206,7 @@ def Get_EnergyMomentum(nbR3,GG=1):
             vij = vel[j, 0:3] - vel[i, 0:3]
             rij = coor[j, 0:3] - coor[i, 0:3]
             Knetic += mass[i] * mass[j] * np.dot(vij, vij) / (2. * Msum)
-            momentum[0,0:3] += mass[i] * mass[j] * (np.cross(rij, vij)) / Msum
+            momentum[0:3] += mass[i] * mass[j] * (np.cross(rij, vij)) / Msum
             potent += - GG * mass[i] * mass[j] / np.linalg.norm(rij) #gravpot[i]  #
 
     for i in range(nbR3):
@@ -214,9 +214,9 @@ def Get_EnergyMomentum(nbR3,GG=1):
         inertia = chipy.RBDY3_GetGlobInertia(i + 1)
         omega_i = vel[i, 3:6]
         Knetic += 0.5 * np.dot(omega_i,np.dot(inertia,omega_i))
-        momentum[0,0:3] += np.dot(inertia,omega_i)
+        momentum[0:3] += np.dot(inertia,omega_i)
     Energy = Knetic + potent
-    momentum[0,3] = np.dot(momentum[0,0:3],momentum[0,0:3])
+    momentum[3] = np.dot(momentum[0:3],momentum[0:3])
     return Energy, Knetic, momentum
 
 

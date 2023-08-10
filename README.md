@@ -32,32 +32,42 @@ x_4-x_1 & y_4-y_1 & z_4-z_1
 
 <img src="./pic/pic_readme/Nbody.png" alt="Nbody" style="zoom:50%;" />
 
-This is an N-body problem, so the motion equation focuses on one single body. At first, The force acts on the $i-th$ part of asteroid is 
-
-$$F^{ext} = m_i \ddot{\mathbf{q}}_i=\sum_{\substack{j=1 \\ j \neq i}}^n \frac{G m_i m_j\left(\mathbf{q}_j-\mathbf{q}_i\right)}{\left\|\mathbf{q}_j-\mathbf{q}_i\right\|^3} + \frac{G m_i m_0\left(\mathbf{q}_0-\mathbf{q}_i\right)}{\left\|\mathbf{q}_0-\mathbf{q}_i\right\|^3}$$
-
-Then, the force law between asteroid and Earth is
+Starting from 3-body problem
 $$
-m_0 \ddot{\mathbf{q}}_0 = -\frac{G m_A m_0\left(\mathbf{q}_0-\mathbf{q}_{cm}\right)}{\left\|\mathbf{q}_0-\mathbf{q}_{cm}\right\|^3}\\
-m_A \ddot{\mathbf{q}}_{cm} = \frac{G m_A m_0\left(\mathbf{q}_0-\mathbf{q}_{cm}\right)}{\left\|\mathbf{q}_0-\mathbf{q}_{cm}\right\|^3}\\
+m_0 \ddot{\mathbf{q}}_0 = \frac{G (m_1+m_2) m_0\left(\mathbf{q}_{cm}-\mathbf{q}_0\right)}{\left\|\mathbf{q}_{cm}-\mathbf{q}_0\right\|^3}\\
+(m_1+m_2) \ddot{\mathbf{q}}_{cm} = \frac{G (m_1+m_2) m_0\left(\mathbf{q}_0-\mathbf{q}_{cm}\right)}{\left\|\mathbf{q}_0-\mathbf{q}_{cm}\right\|^3}\\
+m_1 \ddot{\mathbf{q}}_1 = \frac{G m_1m_2\left(\mathbf{q}_2-\mathbf{q}_1\right)}{\left\|\mathbf{q}_2-\mathbf{q}_1\right\|^3} + \frac{G m_1m_0\left(\mathbf{q}_0-\mathbf{q}_1\right)}{\left\|\mathbf{q}_0-\mathbf{q}_1\right\|^3}\\
+m_2 \ddot{\mathbf{q}}_2 = \frac{G m_1m_2\left(\mathbf{q}_1-\mathbf{q}_2\right)}{\left\|\mathbf{q}_1-\mathbf{q}_2\right\|^3} + \frac{G m_2m_0\left(\mathbf{q}_0-\mathbf{q}_2\right)}{\left\|\mathbf{q}_0-\mathbf{q}_2\right\|^3}\\
 $$
-The relative motion of Earth w.r.t the Asteroid is
+Removing the mass, we get
 $$
-\ddot{\mathbf{q}}_0 - \ddot{\mathbf{q}}_{cm} = -\frac{G (m_A +  m_0)\left(\mathbf{q}_0-\mathbf{q}_{cm}\right)}{\left\|\mathbf{q}_0-\mathbf{q}_{cm}\right\|^3}
+\ddot{\mathbf{q}}_0 = \frac{G (m_1+m_2)\left(\mathbf{q}_{cm}-\mathbf{q}_0\right)}{\left\|\mathbf{q}_{cm}-\mathbf{q}_0\right\|^3}\\
+\ddot{\mathbf{q}}_{cm} = \frac{G m_0\left(\mathbf{q}_0-\mathbf{q}_{cm}\right)}{\left\|\mathbf{q}_0-\mathbf{q}_{cm}\right\|^3}\\
+\ddot{\mathbf{q}}_1 = \frac{G m_2\left(\mathbf{q}_2-\mathbf{q}_1\right)}{\left\|\mathbf{q}_2-\mathbf{q}_1\right\|^3} + \frac{G m_0\left(\mathbf{q}_0-\mathbf{q}_1\right)}{\left\|\mathbf{q}_0-\mathbf{q}_1\right\|^3}\\
+\ddot{\mathbf{q}}_2 = \frac{G m_1\left(\mathbf{q}_1-\mathbf{q}_2\right)}{\left\|\mathbf{q}_1-\mathbf{q}_2\right\|^3} + \frac{Gm_0\left(\mathbf{q}_0-\mathbf{q}_2\right)}{\left\|\mathbf{q}_0-\mathbf{q}_2\right\|^3}\\
 $$
-Also,the center of mass vector is
+Then bring the below relationship into these equations
 $$
-\mathbf{q}_{cm} = \frac{\sum_{\substack{i=1}}^n\mathbf{q}_i}{\sum_{\substack{i=1}}^n m_i} = \frac{\sum_{\substack{i=1}}^n\mathbf{q}_i}{m_A}
+\mathbf{r}_i = \mathbf{q}_{i} - \mathbf{q}_{cm},~~ i=0,1,2
+$$
+we have
+$$
+\ddot{\mathbf{r}}_0 = -\frac{G (m_0+m_1+m_2)\mathbf{r}_0}{\left\|\mathbf{r}_0\right\|^3}\\
+\ddot{\mathbf{r}}_1 = \frac{G m_2(\mathbf{r}_2 - \mathbf{r}_1)}{\left\|\mathbf{r}_2 - \mathbf{r}_1\right\|^3} + \frac{G m_0(\mathbf{r}_0 - \mathbf{r}_1)}{\left\|\mathbf{r}_0 - \mathbf{r}_1\right\|^3} -\frac{G m_0\mathbf{r}_0}{\left\|\mathbf{r}_0\right\|^3}\\
+\ddot{\mathbf{r}}_2 = \frac{G m_1(\mathbf{r}_1 - \mathbf{r}_2)}{\left\|\mathbf{r}_1 - \mathbf{r}_2\right\|^3} + \frac{G m_0(\mathbf{r}_0 - \mathbf{r}_2)}{\left\|\mathbf{r}_0 - \mathbf{r}_2\right\|^3} -\frac{G m_0\mathbf{r}_0}{\left\|\mathbf{r}_0\right\|^3}\\
+$$
+Extended to N-body case
+$$
+\ddot{\mathbf{r}}_0 = -\frac{G (m_0 + m_A)\mathbf{r}_0}{\left\|\mathbf{r}_0\right\|^3}\\
+\ddot{\mathbf{r}}_i = \sum_{\substack{j=1 \\ j \neq i}}^n\frac{G m_j(\mathbf{r}_j - \mathbf{r}_i)}{\left\|\mathbf{r}_j - \mathbf{r}_i\right\|^3} + \frac{G m_0(\mathbf{r}_0 - \mathbf{r}_i)}{\left\|\mathbf{r}_0 - \mathbf{r}_i\right\|^3} -\frac{G m_0\mathbf{r}_0}{\left\|\mathbf{r}_0\right\|^3}\\
+$$
+The first equation can be integrated by the classical two-body problem, and then bring the position $\mathbf{r}_0$ into second equation. The second one can be represented for LMGC90,
+$$
+F^{ext} = m_i \ddot{\mathbf{r}}_i =\sum_{\substack{j=1 \\ j \neq i}}^n\frac{G m_jm_i(\mathbf{r}_j - \mathbf{r}_i)}{\left\|\mathbf{r}_j - \mathbf{r}_i\right\|^3} + \frac{G m_0m_i(\mathbf{r}_0 - \mathbf{r}_i)}{\left\|\mathbf{r}_0 - \mathbf{r}_i\right\|^3} -\frac{G m_0m_i\mathbf{r}_0}{\left\|\mathbf{r}_0\right\|^3}\\
 $$
 Employing a normalized unit to speed up the integration
 
-$$[L] =  (V)^{1/3},~[M] = \sum m_i,~[T] = \sqrt{[L]^3/G[M]},~ G = 1$$
-
-in which $V$ is the volume of the combo. Rewrite the equation,
-
-$$\mu_i F^{ext} =-\sum_{\substack{j=1 \\ j \neq i}}^n \frac{\mu_i \mu_j\mathbf{r}_{ji}}{r_{ji}^3}$$
-
-where $\mu_i = m_i/[M]$.
+$$[L] =  163 ~m,~[M] = \sum m_i = m_A,~[T] = \sqrt{[L]^3/G[M]},~ G = 1$$
 
 ### II.1 Conservation Principles
 

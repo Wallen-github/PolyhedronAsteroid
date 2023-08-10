@@ -13,10 +13,16 @@ import numpy as np
 
 
 def plot_momentum(Plot_T,Plot_Momentum):
+    # plt.figure()
+    # plt.plot(Plot_T,Plot_Momentum[:,3])
+    # plt.xlabel('time')
+    # plt.ylabel('Momentum Square')
+    # plt.show()
+
     plt.figure()
-    plt.plot(Plot_T,Plot_Momentum[:,3])
+    plt.plot(Plot_T, (Plot_Momentum[:, 3] - Plot_Momentum[0, 3])/Plot_Momentum[0, 3])
     plt.xlabel('time')
-    plt.ylabel('Momentum Square')
+    plt.ylabel('(H-H0)/H0')
     plt.show()
 
     plt.figure()
@@ -76,6 +82,18 @@ def plot_velocity(Plot_T, Plot_Vbeg, nbR3, row, col):
         plt.ylabel('Velocity')
         plt.title('body #' + str(i))
         plt.legend(['$v_1$', '$v_2$', '$v_3$'])
+    plt.show()
+
+def plot_earthtraj(Plot_PosVecE):
+
+    plt.figure()
+    ax = plt.axes(projection='3d')
+    ax.plot3D(Plot_PosVecE[:,0],Plot_PosVecE[:,1],Plot_PosVecE[:,2])
+    ax.scatter3D(0,0,0,color='red')
+    ax.set_xlabel('x (km)')
+    ax.set_ylabel('y (km)')
+    ax.set_zlabel('z (km)')
+    ax.set_title('Earth trajectory')
     plt.show()
 
 # Press the green button in the gutter to run the script.
