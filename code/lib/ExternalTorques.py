@@ -18,6 +18,7 @@ from lib.SubFunc import *
 from pylmgc90 import chipy
 from scipy.integrate import solve_ivp
 
+
 def EarthAccel(posE, coor):
     AccelE = np.zeros([6])
     # Get unit
@@ -28,7 +29,7 @@ def EarthAccel(posE, coor):
 
     # Compute the Earth acceleration
     r0i = posE - coor[0:3]
-    AccelE[0:3] = - GG * massE / (np.linalg.norm(r0i)) ** 3 * r0i
+    AccelE[0:3] = GG * massE / (np.linalg.norm(r0i)) ** 3 * r0i
 
     return AccelE
 
@@ -62,7 +63,7 @@ def InitialPosVel_Earth(massA, time):
                          6.332252780541534E+00,3.405149229749669E+00,1.844426571255006E+00])
     PosVecCA = np.zeros([6])
     PosVecCA[0:3] = PosVec[0:3]*1E3/UnitL
-    PosVecCA[4:6] = PosVec[4:6]*1E3*UnitT/UnitL
+    PosVecCA[3:6] = PosVec[3:6]*1E3*UnitT/UnitL
 
     timespan = [0, -time/2]
     tol = 1E-13
@@ -124,5 +125,10 @@ def FlybyOrbit(t,PosVec,mu):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     print('PyCharm')
+
+    UnitM, UnitL, UnitT, GG = Set_Unit()
+    massA = 3.970453830364233e+10/UnitM
+    time = 4*86400/UnitT
+    PosVecE0 = InitialPosVel_Earth(massA, time)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

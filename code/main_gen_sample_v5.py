@@ -4,10 +4,9 @@
 @author: Hai-Shuo Wang
 @email: wallen1732@gamil.com
 @file: main_gen_sample_v5.py
-@date: 7/18/23 19:29
-@desc: 
+@date: 8/8/23 12:27
+@desc: The EOM is in the body-fixed frame
 """
-
 import sys
 sys.path.append('./lib')
 import numpy as np
@@ -15,7 +14,6 @@ from pylmgc90.pre import *
 from lib.readObj import readObj
 from lib.SubFunc import *
 from lib.RotationMatrix import *
-from lib.ExternalTorques import *
 if not os.path.isdir('./DATBOX'):
     os.mkdir('./DATBOX')
 if 'norand' in sys.argv:
@@ -54,43 +52,38 @@ for i in range(len(OBJ)):
     COM += poly0.contactors[0].volume * poly0.nodes[1].coor
     poly0_list.append(poly0)
 
-
-scaleL = volume_total ** (1 / 3)
-COM = COM/volume_total/scaleL
+# Get the scale length to normalized total mass to unity
+UnitL = volume_total ** (1 / 3)
+COM = COM/volume_total/UnitL
 
 # Get Total moment of inertia and DCM
-inertia_total, I_diag, P = Get_TotalMomentOfInertia_gen(poly0_list)
-theta1,theta2,theta3 = DCM2EA_313(P)
+I_global, I_diag, DCM = Get_TotalMomentOfInertia_gen(poly0_list)
+theta1,theta2,theta3 = DCM2EA_313(DCM)
 
 # Set scaled polyhedron
 poly_list = []
-# omegaN = np.array([0.,0.,2.*np.pi/10])
 omegaB = np.array([0.027030895893665, 0., 0.072584774502740])
-
-UnitM, UnitL, UnitT, UnitG  = Set_Unit()
-massA = 1.
-time = 3*86400/UnitT
-PosVecA0 = InitialPosVel_Asteroid(massA, time)
+# omegaB = np.array([0.,0.,0.02*np.pi])
 
 for i in range(len(OBJ)):
     vertices = OBJ[i].vertices/UnitL
     faces = OBJ[i].faces
+    # vertices = ver[i]/UnitL
+    # faces = fac[i]
     poly = rigidPolyhedron(model=mod, material=stone, color='BLEUx',
                             generation_type='full', vertices=vertices, faces=faces)
-    poly.translate(PosVecA0[0]-COM[0], PosVecA0[1]-COM[1], PosVecA0[2]-COM[2])
+    poly.translate(-COM[0], -COM[1], -COM[2])
     poly.rotate(description='Euler', phi=theta1, theta=theta2, psi=theta3)
-    poly.rotate(description='axis', alpha=-np.pi/2,axis=[0., 1., 0.])
+    poly.rotate(description='axis', alpha=np.pi,axis=[0., 0., 1.])
 
     omegaBi = np.dot(poly.bulks[0].axis.T, omegaB)
     r = poly.nodes[1].coor
-    vel = np.cross(omegaB, r) + PosVecA0[3:6]
+    vel = np.cross(omegaB, r)
     velo = [vel[0], vel[1], vel[2], omegaBi[0], omegaBi[1], omegaBi[2]]
     poly.imposeInitValue(component=[1, 2, 3, 4, 5, 6], value=velo)
     poly_list.append(poly)
     bodies.addAvatar(poly)
 
-
-inertia_total, I_diag, P = Get_TotalMomentOfInertia_gen(poly_list)
 
 LawSPSPx = tact_behav(name='rst01', law='RST_CLB', rstn=1.0, rstt=0.0, fric=0.5)
 tacts   += LawSPSPx
