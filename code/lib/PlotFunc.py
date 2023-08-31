@@ -25,6 +25,12 @@ def plot_momentum(Plot_T,Plot_Momentum):
     plt.ylabel('(H-H0)/H0')
     plt.show()
 
+    # plt.figure()
+    # plt.plot(Plot_T, (Plot_Momentum[:, 3] - Plot_Momentum[0, 3])/Plot_Momentum[0, 3])
+    # plt.xlabel('time')
+    # plt.ylabel('(H-H0)/H0')
+    # plt.show()
+
     plt.figure()
     plt.plot(Plot_T, Plot_Momentum[:, 0:3])
     plt.xlabel('time')
