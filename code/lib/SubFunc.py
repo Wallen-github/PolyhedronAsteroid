@@ -8,7 +8,6 @@
 @desc: 
 """
 
-
 # This is a sample Python script.
 
 # Press ⌃R to execute it or replace it with your code.
@@ -89,6 +88,8 @@ def Get_TotalMomentOfInertia_gen(poly_list):
 def DCM2EA_313(DCM):
 
     theta1 = math.atan2(DCM[2,0],-DCM[2,1])
+    if (DCM[2,2] - 1) < 1e-5:
+        DCM[2,2] = 1
     theta2 = math.acos(DCM[2,2])
     theta3 = math.atan2(DCM[0,2],DCM[1,2])
 
@@ -127,12 +128,73 @@ def Get_CenterMass(coor,mass):
 
     return CM,coor_cm
 
+def Get_RelativeAngel(nbR3, mass, coor, NB_pre):
+    """
+    This function aims to get the angles between body positions and the body-fixed vector of max-mass body.
+    The body-fixed vector is the maximum inertial principal direction
+    :param nbR3: number or bodies
+    :param mass: mass list of bodies
+    :param coor: positiona list of bodies
+    :param NB_pre: The previous NB matrix
+    :return: theta_list, angle list
+    """
+
+    # Find the max-mass object
+    max_mass_index = np.argmax(mass)
+
+    # choose the max eigenvalue direction as a body-fixed vector
+    I_global = chipy.RBDY3_GetGlobInertia(int(max_mass_index+1))
+    I_diag, NB = np.linalg.eigh(I_global)
+    NB[:, 2] = np.cross(NB[:, 0], NB[:, 1])
+    # detect if the eigenvector is opposite direction
+    for i in range(3):
+        dis = np.linalg.norm(NB[:,i] - NB_pre[:,i])
+        # if the distance betwee previous eigenvector and current eigenvector larger than 1.1,
+        # the current eigenvalue is point to opposite direction, then I correct it here.
+        # (because the initial NB_pre is [0,0,0] and the dis ~ 1, 1.1 would be a suitable value.)
+        if dis > np.sqrt(2):
+            NB[:,i] = -NB[:,i]
+    NB_pre = NB
+    max_eig_index = np.argmax(I_diag)
+    vector_bodyfix = NB[:,max_eig_index]
+
+    theta_list = []
+    for i in range(nbR3):
+        if i != max_mass_index:
+            relativePos = np.dot(NB.T,coor[i,0:3] - coor[max_mass_index,0:3])
+            R2 = coor[i,0:3] - coor[max_mass_index,0:3]
+            costheta = np.dot(vector_bodyfix,R2)/np.linalg.norm(vector_bodyfix)/np.linalg.norm(R2)
+            theta = math.acos(costheta)
+            theta_list.append(theta)
+
+    return np.array(theta_list), NB_pre, relativePos
+
+def Get_Get_TotalMomentOfInertia_v2(nbR3):
+    Ic = np.zeros([3, 3], dtype=np.float32)
+    MR2 = np.zeros([3, 3], dtype=np.float32)
+    I_global = np.zeros([3, 3], dtype=np.float32)
+    coor = np.zeros([nbR3, 6], dtype=np.float32)
+    mass = np.zeros(nbR3, dtype=np.float32)
+
+    for i in range(nbR3):
+        mass[i] = chipy.RBDY3_GetMass(i + 1)
+        Ic = chipy.RBDY3_GetBodyInertia(i+1)
+        coor[i, :] = chipy.RBDY3_GetBodyVector('Coorb', i + 1)
+        d = np.array(coor[i, 0:3])
+        MR2 = np.array([[d[2]**2 + d[1]**2, -d[0]*d[1], -d[0]*d[2]],
+                        [-d[0]*d[1], d[2]**2 + d[0]**2, -d[1]*d[2]],
+                        [-d[0]*d[2], -d[1]*d[2], d[1]**2 + d[0]**2]])
+        I_global += MR2 + Ic
+
+    I_diag, P = np.linalg.eigh(I_global)
+    P[:, 2] = np.cross(P[:, 0], P[:, 1])
+    return I_global, I_diag, P
 def Get_TotalMomentOfInertia_com(nbR3):
-    inertia_global = np.zeros([3, 3], 'd')
-    coor = np.zeros([nbR3, 6], dtype=float)
+    inertia_global = np.zeros([3, 3], dtype=np.float32)
+    coor = np.zeros([nbR3, 6], dtype=np.float32)
     for i in range(nbR3):
         inertia_global += chipy.RBDY3_GetGlobInertia(i+1)
-        coor[i, :] = [0.,0.,0.,0.,0.,0.]#chipy.RBDY3_GetBodyVector('Coorb', i + 1)
+        coor[i, :] = chipy.RBDY3_GetBodyVector('Coorb', i + 1)
         volume = chipy.RBDY3_GetVolume(i+1)
         for j in range(0, 3):
             d = np.array(coor[i, 0:3])
@@ -186,11 +248,11 @@ def Get_TotalMomentOfInertia_com(nbR3):
 
 def Get_EnergyMomentum(nbR3,GG=1):
 
-    momentum = np.zeros([4], dtype=float)
-    mass = np.zeros([nbR3], dtype=float)
-    coor = np.zeros([nbR3, 6], dtype=float)
-    vel = np.zeros([nbR3, 6], dtype=float)
-    vel_cm = np.zeros([3], dtype=float)
+    momentum = np.zeros([4], dtype=np.float32)
+    mass = np.zeros([nbR3], dtype=np.float32)
+    coor = np.zeros([nbR3, 6], dtype=np.float32)
+    vel = np.zeros([nbR3, 6], dtype=np.float32)
+    vel_cm = np.zeros([3], dtype=np.float32)
     Energy = 0
     Knetic = 0
     potent = 0

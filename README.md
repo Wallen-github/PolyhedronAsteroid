@@ -178,7 +178,33 @@ The comparison between the 0th-order and 2nd-order gravity is determined with th
 
 ![Gravity_Compare_0and2order](./pic/pic_readme/Gravity_Compare_0and2order.png)
 
-### 
+### III-2. Flyby Orbit ($v_\infin$ and $q$)
+
+Here we assume $i=\Omega=\omega = 0$, then we can get $a, e$ from $\vec{v}_\infin$ and $q$.
+$$
+\vec{v}_\infin^2 = \mu_E (\frac{2}{r_\infin} + \frac{q}{a}) \rightarrow a = \frac{\mu_E}{|v_\infin|^2} \\ 
+r_p = q = \frac{a(e^2 -1)}{1 + e \cos f_p} \rightarrow e = \frac{q}{a} +1
+$$
+From the orbital elements $a,e,i=\Omega=\omega = 0$, we can get the periapsis position and velocity vectors,
+$$
+v_p = \sqrt{\mu_E(\frac{2}{q} + \frac{1}{a})}\\
+\boldsymbol{r}_{C/A} = [q,0,0], ~ \boldsymbol{v}_{C/A} = [0,-v_p,0]
+$$
+Then back propagate the position and vector at close approach to get the initial position and velocity.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

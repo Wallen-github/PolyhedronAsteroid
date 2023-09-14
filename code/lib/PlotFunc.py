@@ -11,6 +11,36 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+def plot_distance(Plot_T, Plot_Distance):
+    plt.figure()
+    plt.plot(Plot_T, (Plot_Distance - Plot_Distance[0]) / Plot_Distance[0])
+    plt.xlabel('time')
+    plt.ylabel('Distance')
+    plt.show()
+def plot_angel(Plot_T, Plot_Angle, Plot_vector):
+    plt.figure()
+    plt.plot(Plot_T, (Plot_Angle))
+    plt.xlabel('time')
+    plt.ylabel('Angle (deg)')
+    plt.show()
+
+    plt.figure()
+    plt.plot(Plot_T, Plot_vector[:, 0:3])
+    plt.xlabel('time')
+    plt.ylabel('vector')
+    plt.legend(['$v_1$', '$v_2$', '$v_3$'])
+    plt.show()
+
+    plt.figure()
+    ax = plt.axes(projection='3d')
+    ax.scatter3D(Plot_vector[:, 0], Plot_vector[:, 1], Plot_vector[:, 2])
+    # ax.scatter3D(Plot_vector[:, 0], Plot_vector[:, 1], Plot_vector[:, 2],color='black')
+    ax.scatter3D(0, 0, 0, color='red')
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+    ax.set_title('Secondary position at Primary body-fixed frame')
+    plt.show()
 
 def plot_momentum(Plot_T,Plot_Momentum):
     # plt.figure()

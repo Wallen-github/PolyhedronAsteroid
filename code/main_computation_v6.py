@@ -8,7 +8,6 @@
 @desc: 
 """
 
-
 from __future__ import print_function
 import os, sys
 import numpy as np
@@ -19,7 +18,7 @@ import time
 sys.path.append("..")
 from lib.SubFunc import *
 from pylmgc90 import chipy
-from pykdgrav import *
+# from pykdgrav import *
 
 chipy.Initialize()
 
@@ -100,7 +99,7 @@ for i in range(nbR3):
 # Get the initial position of Earth
 massA = np.sum(mass)
 # PosVecE0 = InitialPosVel_Earth(massA, total_time)
-pos_p = 1.2 * 6378.14E3 #m # 38012 km for Apophis
+pos_p = 1 * 6378.14E3 #m # 38012 km for Apophis
 vel_inf = 10E3 # 5.946E3 # m/s
 PosVecE0 = InitialPosVel_Earth_v2(massA, vel_inf, pos_p, total_time)
 
@@ -168,7 +167,7 @@ for k in range(1, nb_steps + 1):
                 F_nbody[0:3] += GG*mass[j]*(coor[j,0:3]-coor[i,0:3])/r_norm**3
         r0_norm = np.linalg.norm(posE-coor[i,0:3])
         posE_norm = np.linalg.norm(posE)
-        F_nbody[0:3] += GG*massE*(posE-coor[i,0:3])/r0_norm**3 - GG*massE*posE/posE_norm**3
+        # F_nbody[0:3] += GG*massE*(posE-coor[i,0:3])/r0_norm**3 - GG*massE*posE/posE_norm**3
         fext[i,0:3] = mass[i] * F_nbody[0:3]
 
     chipy.timer_StopTimer(timer_id)
@@ -230,6 +229,6 @@ plot_momentum(Plot_T,Plot_Momentum)
 # plot_energy(Plot_T,Plot_Energy)
 # plot_omega(Plot_T, Plot_Vbeg, nbR3, 2, 1)
 # plot_velocity(Plot_T, Plot_Vbeg, nbR3, 2, 1)
-plot_eulerangle(Plot_T, Plot_EA)
+# plot_eulerangle(Plot_T, Plot_EA)
 plot_inertia(Plot_T, Plot_inertia)
 plot_earthtraj(Plot_PosVecE)

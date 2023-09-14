@@ -7,7 +7,7 @@
 @date: 7/18/23 16:10
 @desc: 
 """
-
+import math
 
 # This is a sample Python script.
 
@@ -101,11 +101,32 @@ def InitialPosVel_Earth_v2(massA, vel_inf, pos_p, time):
     muE = GG*massE
 
     axi = muE/vel_inf**2
-    vel_p = np.sqrt(muE*(2.0/pos_p+1./axi))
+    ecc = pos_p/axi + 1
+    f = 0
+    inc = 0
+    LOme = 0
+    COme = 0
+    p = axi*(ecc**2-1)
+    r = p/(1+ecc*np.cos(f))
+    # vel_p = np.sqrt(muE*(2.0/pos_p+1./axi))
+    vel_p = np.sqrt(muE/p)*(1+ecc)
+
+    Phat = np.array([np.cos(COme) * np.cos(LOme) - np.sin(LOme)*np.sin(LOme)*np.cos(inc),
+                     np.sin(COme) * np.cos(LOme) + np.cos(LOme)*np.sin(LOme)*np.cos(inc),
+                     np.sin(LOme)*np.sin(inc)])
+    Qhat = np.array([-np.cos(COme) * np.sin(LOme) - np.sin(LOme)*np.cos(LOme)*np.cos(inc),
+                     -np.sin(COme) * np.sin(LOme) + np.cos(LOme)*np.cos(LOme)*np.cos(inc),
+                     np.cos(LOme)*np.sin(inc)])
 
     PosVecCA = np.zeros([6])
-    PosVecCA[0:3] = np.array([pos_p, 0., 0.])/UnitL
-    PosVecCA[3:6] = np.array([0., -vel_p, 0.])*UnitT/UnitL
+    PosVecCA[0:3] = r*np.cos(f)*Phat + r*np.sin(f)*Qhat
+    PosVecCA[3:6] = np.sqrt(muE/p)*(-np.sin(f)*Phat + (np.cos(f) + ecc)*Qhat)
+
+    PosVecCA[0:3] = PosVecCA[0:3] / UnitL
+    PosVecCA[3:6] = PosVecCA[3:6] *UnitT/UnitL
+
+    # PosVecCA[0:3] = np.array([pos_p, 0., 0.])/UnitL
+    # PosVecCA[3:6] = np.array([0., -vel_p, 0.])*UnitT/UnitL
 
     timespan = [0, -time / 2]
     tol = 1E-13
