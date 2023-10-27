@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
+  <UnstructuredGrid>
+    <Piece NumberOfPoints="2"                    NumberOfCells="2"                   >
+      <PointData>
+        <DataArray type="Int32" Name="Ids" format="appended" RangeMin="1"                    RangeMax="2"                    offset="0"                   />
+        <DataArray type="Float32" Name="Disp" NumberOfComponents="3" format="appended" RangeMin="0.048776281134"       RangeMax="0.16984576822"        offset="44"                  />
+        <DataArray type="Float32" Name="Velocy" NumberOfComponents="3" format="appended" RangeMin="0.0099641629254"      RangeMax="0.034696584835"       offset="112"                 />
+        <DataArray type="Float32" Name="Fext" NumberOfComponents="3" format="appended" RangeMin="0.5826883859"         RangeMax="0.5826883859"         offset="180"                 />
+        <DataArray type="Float32" Name="Reac" NumberOfComponents="3" format="appended" RangeMin="0.58205586741"        RangeMax="0.58205586741"        offset="244"                 />
+        <DataArray type="Float32" Name="Spin" NumberOfComponents="3" format="appended" RangeMin="0.082004748571"       RangeMax="0.082004749119"       offset="308"                 />
+        <DataArray type="Float32" Name="Mext" NumberOfComponents="3" format="appended" RangeMin="1.7820921903e-05"     RangeMax="3.5927728304e-05"     offset="368"                 />
+        <DataArray type="Float32" Name="Torque" NumberOfComponents="3" format="appended" RangeMin="1.2663190815e-05"     RangeMax="3.0065369334e-05"     offset="436"                 />
+        <DataArray type="Float32" Name="alpha" NumberOfComponents="3" format="appended" RangeMin="0.99999997633"        RangeMax="0.99999998076"        offset="504"                 />
+        <DataArray type="Float32" Name="beta" NumberOfComponents="3" format="appended" RangeMin="1.0000000062"         RangeMax="1.0000000236"         offset="572"                 />
+        <DataArray type="Float32" Name="gamma" NumberOfComponents="3" format="appended" RangeMin="0.9999999774"         RangeMax="1.000000014"          offset="640"                 />
+      </PointData>
+      <CellData>
+      </CellData>
+      <Points>
+        <DataArray type="Float32" Name="Points" NumberOfComponents="3" format="appended" RangeMin="0.12168440268"        RangeMax="0.42372110277"        offset="708"                 />
+      </Points>
+      <Cells>
+        <DataArray type="Int64" Name="connectivity" format="appended" RangeMin=""                     RangeMax=""                     offset="776"                 />
+        <DataArray type="Int64" Name="offsets" format="appended" RangeMin=""                     RangeMax=""                     offset="820"                 />
+        <DataArray type="UInt8" Name="types" format="appended" RangeMin=""                     RangeMax=""                     offset="864"                 />
+      </Cells>
+    </Piece>
+  </UnstructuredGrid>
+  <AppendedData encoding="base64">
+   _AQAAAACAAAAIAAAADgAAAA==eJxjZGBgYAJiAAAYAAQ=AQAAAACAAAAYAAAAIQAAAA==eJxb+2mpjcrZE3st63jsuubv26218plNUbLiXgCgRwxCAQAAAACAAAAYAAAAIQAAAA==eJz7f/Wxtd4crr3Ku4N2y95h2p1oKW/zULDICgCX0gq4AQAAAACAAAAYAAAAHgAAAA==eJz7lM5r35PDaMfCz73vUzrvfiB7H5BtBwBrdgfxAQAAAACAAAAYAAAAHgAAAA==eJxzdOTdv9WDcV/OPS47R0deeyDbDsjeBwBq+Ai5AQAAAACAAAAYAAAAGgAAAA==eJy75XvCZsoX2d3/rBbY3gSyp0LZAKoCDUE=AQAAAACAAAAYAAAAIQAAAA==eJzrjuzd7r1PwuwJ72az62efbjt9R3iHWEuvKQCa2wxnAQAAAACAAAAYAAAAIQAAAA==eJzjK7Iz570zb9tub69twjJN21mXXTZ3W7rWDAB4TwokAQAAAACAAAAYAAAAIQAAAA==eJyb6+++t+GK/v66pZb793GK7K+TV9hvKsFmDwCPDgn2AQAAAACAAAAYAAAAIQAAAA==eJwzMfizz+m1qr3vepH9/w0/2J74YbR/ygST/QCWbgykAQAAAACAAAAYAAAAIQAAAA==eJxrK4yz78lcYfczeu++Hev97DcmbNxX1fPFDgCatgzrAQAAAACAAAAYAAAAIAAAAA==eJx7tPzsvkc2e/b22p4Cwje2U6xu2HwOfLEHALsXDnc=AQAAAACAAAAQAAAADgAAAA==eJxjYIAARigNAAAYAAI=AQAAAACAAAAQAAAADgAAAA==eJxjZIAAJigNAAAwAAQ=AQAAAACAAAACAAAACgAAAA==eJxjZAQAAAUAAw==
+  </AppendedData>
+</VTKFile>

@@ -13,9 +13,15 @@ import numpy as np
 
 def plot_distance(Plot_T, Plot_Distance):
     plt.figure()
-    plt.plot(Plot_T, (Plot_Distance - Plot_Distance[0]) / Plot_Distance[0])
+    plt.plot(Plot_T, Plot_Distance)
     plt.xlabel('time')
     plt.ylabel('Distance')
+    plt.show()
+
+    plt.figure()
+    plt.plot(Plot_T, np.sum(Plot_Distance,axis=1))
+    plt.xlabel('time')
+    plt.ylabel('Distance Sum')
     plt.show()
 def plot_angel(Plot_T, Plot_Angle, Plot_vector):
     plt.figure()
@@ -66,6 +72,19 @@ def plot_momentum(Plot_T,Plot_Momentum):
     plt.xlabel('time')
     plt.ylabel('Momentum')
     plt.legend(['$H_1$','$H_2$','$H_3$'])
+    plt.show()
+
+def plot_Effective(Plot_T, plot_Effective):
+    plt.figure()
+    plt.plot(Plot_T, plot_Effective[:,0])
+    plt.xlabel('time')
+    plt.ylabel('det(I_g)')
+    plt.show()
+
+    plt.figure()
+    plt.plot(Plot_T, plot_Effective[:, 1])
+    plt.xlabel('time')
+    plt.ylabel('w_e')
     plt.show()
 
 def plot_kinetic(Plot_T,Plot_Kinetic):
