@@ -3,30 +3,33 @@
 """
 @author: Hai-Shuo Wang
 @email: wallen1732@gamil.com
-@file: computation_periapsis_velocity.py
-@date: 9/10/23 00:03
+@file: main_computation_inclination.py
+@date: 9/16/23 15:12
 @desc: 
 """
 from __future__ import print_function
 import os, sys
 import numpy as np
 from lib.ExternalTorques import *
-from lib.PlotFunc import *
 import time
+import pandas as pd
 
 sys.path.append("..")
 from lib.SubFunc import *
 from pylmgc90 import chipy
 
-
-def Compute_periapsis_velocity(pos_p, vel_inf):
+def Initial_computation():
     chipy.Initialize()
 
     chipy.checkDirectories()
 
     chipy.utilities_DisableLogMes()
     # timer gravity
+    # chipy.timer_InitializeTimers()
     timer_id = chipy.timer_GetNewTimer('gravity computation')
+    return timer_id
+
+def Computation_inc(pos_p, vel_inf, inc, max_radius, timer_id):
 
     chipy.SetDimension(3)
 
@@ -36,8 +39,6 @@ def Compute_periapsis_velocity(pos_p, vel_inf):
     dt = 1.e-3
     theta = 0.5
     nb_steps = int(total_time / dt)
-
-    echo = 0
 
     freq_display = 400
     ref_radius = 5.
@@ -92,36 +93,25 @@ def Compute_periapsis_velocity(pos_p, vel_inf):
 
     nbR3 = chipy.RBDY3_GetNbRBDY3()
 
-    mass = np.zeros(nbR3)
+    mass = np.zeros(nbR3, dtype=np.float32)
     for i in range(nbR3):
         mass[i] = chipy.RBDY3_GetMass(i + 1)
 
     # Get the initial position of Earth
     massA = np.sum(mass)
-    # PosVecE0 = InitialPosVel_Earth(massA, total_time)
-    # pos_p = 1 * 6378.14E3  # m # 38012 km for Apophis
-    # vel_inf = 10E3  # 5.946E3 # m/s
-    PosVecE0 = InitialPosVel_Earth_v2(massA, vel_inf, pos_p, total_time)
+    PosVecE0 = InitialPosVel_Earth_v3(massA, vel_inf, pos_p, inc, total_time)
 
-    coor = np.zeros([nbR3, 6], dtype=float)
-    vbeg = np.zeros([nbR3, 6], dtype=float)
-    fext = np.zeros([nbR3, 6], dtype=float)
-    fext_pykd = np.zeros([nbR3, 6], dtype=float)
-
-    # varibles for plot
-    Plot_T = np.zeros([nb_steps, 1], dtype=float)
-    Plot_Momentum = np.zeros([nb_steps, 4], dtype=float)
-    Plot_Kinetic = np.zeros([nb_steps, 1], dtype=float)
-    Plot_Energy = np.zeros([nb_steps, 1], dtype=float)
-    Plot_Vbeg = np.zeros([nb_steps, nbR3 * 6], dtype=float)
-    Plot_inertia = np.zeros([nb_steps, 3], dtype=float)
-    Plot_EA = np.zeros([nb_steps, 3], dtype=float)
-    Plot_PosVecE = np.zeros([nb_steps, 6], dtype=float)
+    coor = np.zeros([nbR3, 6], dtype=np.float32)
+    vbeg = np.zeros([nbR3, 6], dtype=np.float32)
+    vbeg0 = np.zeros([nbR3, 6], dtype=np.float32)
+    fext = np.zeros([nbR3, 6], dtype=np.float32)
+    relative_distance = np.zeros(nbR3, dtype=np.float32)
+    Record_info = np.zeros([nb_steps, 5], dtype=np.float32)
 
     chipy.OpenDisplayFiles()
     chipy.WriteDisplayFiles(1)
 
-    time_start = time.time()
+    # time_start = time.time()
 
     for k in range(1, nb_steps + 1):
         if k % int(nb_steps / 10) == 0: print(k, '/', (nb_steps + 1))
@@ -130,27 +120,25 @@ def Compute_periapsis_velocity(pos_p, vel_inf):
 
         chipy.ComputeFext()
 
+        if k==2:
+            for i in range(0, nbR3, 1):
+                vbeg0[i, :] = chipy.RBDY3_GetBodyVector('Vfree', i + 1)
+
         # Get the bodies position and velocity
         for i in range(0, nbR3, 1):
             coor[i, :] = chipy.RBDY3_GetBodyVector('Coorb', i + 1)
             vbeg[i, :] = chipy.RBDY3_GetBodyVector('Vfree', i + 1)
-
-        # Get Energy, momentum and other tracking parameters
-        Energy, Kinetic, momentum = Get_EnergyMomentum(nbR3, GG=1)
-        I_global, I_body, DCM_NB = Get_TotalMomentOfInertia_com(nbR3)
-        theta1, theta2, theta3 = DCM2EA_313(DCM_NB)
 
         chipy.timer_StartTimer(timer_id)
 
         # Get Earth acceleration and position
         posE, PosVec = EarthPos(massA, k, dt, PosVecE0)
         PosVecE0 = PosVec
-
         # Get N-body force
         GG = UnitG
         massE = 5.974227245203837E24 / UnitM  # kg, Earth mass
         for i in range(0, nbR3, 1):
-            F_nbody = np.zeros([6], dtype=float)
+            F_nbody = np.zeros([6], dtype=np.float32)
             for j in range(0, nbR3, 1):
                 if j != i:
                     r_norm = np.linalg.norm(coor[j, 0:3] - coor[i, 0:3])
@@ -165,16 +153,13 @@ def Compute_periapsis_velocity(pos_p, vel_inf):
         for i in range(0, nbR3, 1):
             chipy.RBDY3_PutBodyVector('Fext_', i + 1, fext[i, :])
 
-        # Record data for plot
-        Plot_T[k - 1, 0] = dt * (k - 1) * UnitT / 3600
-        Plot_Energy[k - 1, 0] = Energy
-        Plot_Kinetic[k - 1, 0] = Kinetic
-        Plot_Momentum[k - 1, :] = momentum
-        Plot_inertia[k - 1, :] = I_body
-        Plot_EA[k - 1, :] = [theta1, theta2, theta3]
-        Plot_PosVecE[k - 1, :] = np.append(PosVec[0:3] * UnitL / 1E3, PosVec[3:6] * UnitL / 1E3 / UnitT)
-        for i in range(0, nbR3, 1):
-            Plot_Vbeg[k - 1, i * 6:i * 6 + 6] = vbeg[i, :]
+        max_mass_index = np.argmax(mass)
+        if k == 1:
+            dis0 = Get_RelativeDistance(nbR3, mass, coor)
+        relative_distance = abs(Get_RelativeDistance(nbR3, mass, coor) - dis0)
+        info, loss_num, nomove_num, shifting_num, circular_num = Detect_State(nbR3, max_mass_index, relative_distance,
+                                                                              max_radius)
+        Record_info[k - 1, :] = np.array([info, loss_num, nomove_num, shifting_num, circular_num])
 
         chipy.ComputeBulk()
         chipy.ComputeFreeVelocity()
@@ -196,20 +181,76 @@ def Compute_periapsis_velocity(pos_p, vel_inf):
 
         chipy.overall_CleanWriteOutFlags()
 
+        if info == 0:
+            print('System breakup')
+            break
+
     chipy.WriteLastDof()
     chipy.CloseDisplayFiles()
+    # chipy.timer_ClearAll()
 
     chipy.Finalize()
+
+    # time_end = time.time()
+    # print('!-------------------------------------!')
+    # print('     Computation Cost: ', time_end - time_start, ' second')
+
+    return Record_info, relative_distance, np.linalg.norm(vbeg[max_mass_index,3:6])/np.linalg.norm(vbeg0[max_mass_index,3:6])
+
+
+
+# Press the green button in the gutter to run the script.
+if __name__ == '__main__':
+    UnitM, UnitL, UnitT, UnitG = Set_Unit()
+    max_radius = np.array([0.6077247, 0.7198549])
+    # max_radius = np.array([0.656534, 0.73158497, 0.48802143])
+    # pos_p = 1.1 * 6378.14E3  # m # 38012 km for Apophis
+    # vel_inf = 8E3  # 5.946E3 # m/s
+
+    timer_id  = Initial_computation()
+
+    RowNum = 10
+    inc_max = 2*np.pi
+    inc_min = 0
+    inc_step = (inc_max - inc_min) / (RowNum-1)
+    Rec_info = np.zeros(RowNum, dtype=np.float32)
+    Rec_period = np.zeros(RowNum, dtype=np.float32)
+    Rec_inc = np.zeros(RowNum, dtype=np.float32)
+
+    time_start = time.time()
+    for i in range(RowNum):
+        print('-------------------')
+        print('i = ', i )
+        print('-------------------')
+        vel_inf = 27.222222E3 #v2= 13.3333333E3 #v1 = 10.55555555E3 # m/s
+        pos_p = 1.411111 * 6378.14E3 #v2= 1.72222 * 6378.14E3 # v2 = 1.1 * 6378.14E3 # RE
+        inc = inc_min = i* inc_step
+        # [info, loss_num, nomove_num, shifting_num, circular_num]
+        info, relative_distance, wbeg = Computation_inc(pos_p, vel_inf,inc, max_radius, timer_id)
+
+        print('info = ', info[-1,:], '(info, loss_num, nomove_num, shifting_num, circular_num)')
+        Rec_inc[i] = inc # rad
+        Rec_period[i] = 1/wbeg
+        if info[-1, 0] ==0:
+            Rec_info[i] = -1 # breakup
+        if info[-1, 2] != 0:
+            Rec_info[i] = 0 # no move
+        elif info[-1,3] != 0:
+            Rec_info[i] = relative_distance[0]*UnitL # shifting
+        elif info[-1, 4] != 0:
+            Rec_info[i] = 2 # circular
+        elif info[-1, 1] !=0:
+            Rec_info[i] = 3 # loss some bodies
 
     time_end = time.time()
     print('!-------------------------------------!')
     print('     Computation Cost: ', time_end - time_start, ' second')
 
-def Detect
+    # Write Data
+    out_info = pd.DataFrame(Rec_info)
+    out_period = pd.DataFrame(Rec_period)
+    out_inc = pd.DataFrame(Rec_inc)
 
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    out_info.to_csv('./data/inc2b_info_v2.txt', sep=',', index=False, header=None)
+    out_period.to_csv('./data/inc2b_period_v2.txt', sep=',', index=False, header=None)
+    out_inc.to_csv('./data/inc2b_inc_v2.txt', sep=',', index=False, header=None)

@@ -99,11 +99,65 @@ def InitialPosVel_Earth_v2(massA, vel_inf, pos_p, time):
     UnitM, UnitL, UnitT, GG = Set_Unit()
     massE = 5.974227245203837E24 / UnitM  # kg, Earth mass
     muE = GG*massE
+    if vel_inf == 0:
+        ecc = 1
+        p = 2*pos_p
+    else:
+        axi = muE/vel_inf**2
+        ecc = pos_p/axi + 1
+        p = axi * (ecc ** 2 - 1)
+    f = 0
+    inc = 0
+    LOme = 0
+    COme = 0
+    r = p / (1 + ecc * np.cos(f))
+
+    Phat = np.array([np.cos(COme) * np.cos(LOme) - np.sin(LOme)*np.sin(LOme)*np.cos(inc),
+                     np.sin(COme) * np.cos(LOme) + np.cos(LOme)*np.sin(LOme)*np.cos(inc),
+                     np.sin(LOme)*np.sin(inc)])
+    Qhat = np.array([-np.cos(COme) * np.sin(LOme) - np.sin(LOme)*np.cos(LOme)*np.cos(inc),
+                     -np.sin(COme) * np.sin(LOme) + np.cos(LOme)*np.cos(LOme)*np.cos(inc),
+                     np.cos(LOme)*np.sin(inc)])
+
+    PosVecCA = np.zeros([6])
+    PosVecCA[0:3] = r*np.cos(f)*Phat + r*np.sin(f)*Qhat
+    PosVecCA[3:6] = np.sqrt(muE/p)*(-np.sin(f)*Phat + (np.cos(f) + ecc)*Qhat)
+
+    PosVecCA[0:3] = PosVecCA[0:3] / UnitL
+    PosVecCA[3:6] = PosVecCA[3:6] *UnitT/UnitL
+
+    timespan = [0, -time / 2]
+    tol = 1E-13
+    mu = GG * (massA + massE)
+    PosVecSol = solve_ivp(fun=FlybyOrbit, t_span=timespan, y0=PosVecCA, args=(mu,), method='RK45',
+                          rtol=tol, atol=tol)
+
+    # Get the Earth's initial position w.r.t Apophis center
+    PosVecE0 = - PosVecSol.y[:, -1].copy()
+
+    return PosVecE0
+
+def InitialPosVel_Earth_v3(massA, vel_inf, pos_p, inc, time):
+    """
+    This function generate a planar hyperbolic flyby orbit, which are defined by the encounter velocity at
+    infinity, vel_inf, and the perigee distance, pos_p.
+    :param massA: Asteroid mass
+    :param vel_inf: the encounter velocity at infinity
+    :param pos_p: the perigee distance
+    :param time: Days before close approach
+    :return: initial position and velocity
+    """
+
+    # For Apophis, we have pos_p = 38012 km, ecc = 4.229, axi = 1.152E4 km, vel_inf = 5.882 km/s
+
+    # Get unit
+    UnitM, UnitL, UnitT, GG = Set_Unit()
+    massE = 5.974227245203837E24 / UnitM  # kg, Earth mass
+    muE = GG*massE
 
     axi = muE/vel_inf**2
     ecc = pos_p/axi + 1
     f = 0
-    inc = 0
     LOme = 0
     COme = 0
     p = axi*(ecc**2-1)
@@ -136,7 +190,6 @@ def InitialPosVel_Earth_v2(massA, vel_inf, pos_p, time):
 
     # Get the Earth's initial position w.r.t Apophis center
     PosVecE0 = - PosVecSol.y[:, -1].copy()
-
 
     return PosVecE0
 

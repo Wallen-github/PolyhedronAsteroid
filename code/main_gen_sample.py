@@ -125,7 +125,7 @@ writeBulkBehav(mat, chemin='DATBOX/', dim=dim , gravy=[0.,0.,0.])
 writeTactBehav(tacts, svs, chemin='DATBOX/')
 writeDrvDof(bodies, chemin='DATBOX/')
 writeDofIni(bodies, chemin='DATBOX/')
-writeVlocRlocIni(chemin='DATBOX/')
+writeVlocRlocIni(chemin='DATBOX
 
 try:
   visuAvatars(bodies,with_axis=True)

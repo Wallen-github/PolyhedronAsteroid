@@ -1,7 +1,7 @@
 # I PolyhedronSimulation
 This Project uses LMGC90 to simulate Polyhendron's behavior under gravitation. The LMGC90 is one of the discrete element methods which can handle detailed contact dynamics.
 
-There are a few papers about the code and the method (by [F. Dubois](https://scholar.google.com/citations?user=boV9fugAAAAJ&hl=en&oi=ao) and others) that you can find for yourself.  However, this is a [paper](https://www.sciencedirect.com/science/article/pii/S0019103521001238) we wrote about the implementation of self-gravity.  The code also has a [wiki](https://git-xen.lmgc.univ-montp2.fr/lmgc90/lmgc90_user/-/wikis/home) page and a very comprehensive [documentation page](http://www.lmgc.univ-montp2.fr/~mozul/LMGC90_USER/UserDoc/docs_2019/#) that you will find very useful once you start using it.
+There are a few papers about the code and the method (by [F. Dubois](https://scholar.google.com/citations?user=boV9fugAAAAJ&hl=en&oi=ao) and others) that you can find for yourself.  However, this is a [paper](https://www.sciencedirect.com/science/article/pii/S0019103521001238) we wrote about the implementation of self-gravity.  The code also has a [wiki](https://git-xen.lmgc.univ-montp2.fr/lmgc90/lmgc90_user/-/wikis/home) page and a very comprehensive [documentation page](https://lmgc90.pages-git-xen.lmgc.univ-montp2.fr/lmgc90_dev/) that you will find very useful once you start using it.
 
 The implementation of gravitational forces is of paramount importance when simulating granular asteroids. In this work the Open Source Python library written by Mike Grudić, called [pykdgrav](https://github.com/mikegrudic/pytreegrav), is used [(Guszejnov et al., 2019a)](https://academic.oup.com/mnras/article/492/1/488/5679905). This routine is not to be confused with the PKDgrav code which has been used for many years in the Planetary and Space Science community to carry out research on asteroids, comets and planetary rings. Grudić affirms however, having taken the idea of implementing a kd-tree instead of an octree from PKDgrav. 
 
@@ -182,29 +182,44 @@ The comparison between the 0th-order and 2nd-order gravity is determined with th
 
 Here we assume $i=\Omega=\omega = 0$, then we can get $a, e$ from $\vec{v}_\infin$ and $q$.
 $$
-\vec{v}_\infin^2 = \mu_E (\frac{2}{r_\infin} + \frac{q}{a}) \rightarrow a = \frac{\mu_E}{|v_\infin|^2} \\ 
-r_p = q = \frac{a(e^2 -1)}{1 + e \cos f_p} \rightarrow e = \frac{q}{a} +1
+\vec{v}_\infin^2 = \mu_E (\frac{2}{r_\infin} + \frac{q}{a}) \rightarrow a = -\frac{\mu_E}{|v_\infin|^2} \\ 
+r_p = q = \frac{a(e^2 -1)}{1 + e \cos f_p} \rightarrow e = \frac{q}{-a} +1 = 1+\frac{qv_\infin^2}{\mu_E}
 $$
 From the orbital elements $a,e,i=\Omega=\omega = 0$, we can get the periapsis position and velocity vectors,
 $$
-v_p = \sqrt{\mu_E(\frac{2}{q} + \frac{1}{a})}\\
-\boldsymbol{r}_{C/A} = [q,0,0], ~ \boldsymbol{v}_{C/A} = [0,-v_p,0]
+\boldsymbol{r}_p = r \cos f \hat{\boldsymbol{P}} + r\sin f \hat{\boldsymbol{Q}}\\
+\dot{\boldsymbol{r}}_p = \sqrt{\frac{\mu}{p}} [-\sin f \hat{\boldsymbol{P}} + (\cos f + e) \hat{\boldsymbol{Q}}]
+$$
+in which,
+$$
+\hat{\boldsymbol{P}} = \left(\begin{array}{c}
+\cos \Omega \cos \omega-\sin \Omega \sin \omega \cos i \\
+\sin \Omega \cos \omega+\cos \Omega \sin \omega \cos i \\
+\sin \omega \sin i
+\end{array}\right) \\
+\hat{\boldsymbol{Q}}=\left(\begin{array}{c}
+-\cos \Omega \sin \omega-\sin \Omega \cos \omega \cos i \\
+-\sin \Omega \sin \omega+\cos \Omega \cos \omega \cos i \\
+\cos \omega \sin i
+\end{array}\right)
 $$
 Then back propagate the position and vector at close approach to get the initial position and velocity.
 
+## IV. Critical Radius
 
+**Roche Radius**
 
+Roche (1847; see Chandrasekhar 1969) showed that a self-gravitating synchronously rotating liquid satellite circling a spherical planet has no stable equilibrium figure inside a critical distance,
+$$
+r_{\text {Roche }}=1.52\left(\frac{M_E}{\rho_A}\right)^{1 / 3}=2.46 R_E\left(\frac{\rho_E}{\rho_A}\right)^{1 / 3}
+$$
+In which $M_E = 5.97\times10^{24} ~kg, R_E = 6371 ~km, \rho_E = 5.51\times 10^3 ~kg/m^3$ are the Earth's mass, radius, and density respectively, and $\mu_A = 2.650 ~m^3/s^2, V_A = 1.986\times10^7 ~m^3, \rho_A = \mu_A/G/V_A = 1.9992\times10^3$ is the Apophis density.
+$$
+r_{\text {Roche }}= 3.4511 R_E
+$$
+**Disruption Radius**
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+Sridhar and Tremaine (1992) developed an analytical methodology to ascertain how nonrotating, self-gravitating, viscous bodies undergo tidal disruption during parabolic encounters with a planet. They showed that such bodies shed mass if their periapse is smaller than
+$$
+r_{\text {disrupt }}=0.69 r_{\text {Roche }}=1.05\left(\frac{M_E}{\rho_E}\right)^{1 / 3}=1.69 R_E\left(\frac{\rho_E}{\rho_A}\right)^{1 / 3} = 2.3813 R_E
+$$
